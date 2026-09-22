@@ -1,0 +1,273 @@
+/* Homepage. The hero uses a faint grid wash rather than a gradient so the page
+ * reads as a technical surface rather than a marketing page. */
+
+.hero {
+  position: relative;
+  padding-block: var(--sp-8) var(--sp-7);
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: radial-gradient(ellipse 80% 60% at 20% 0%, black, transparent 75%);
+  pointer-events: none;
+}
+
+.hero > .container {
+  position: relative;
+}
+
+h1 {
+  font-size: var(--text-4xl);
+  letter-spacing: -0.035em;
+  margin: var(--sp-4) 0 var(--sp-5);
+}
+
+.accent {
+  color: var(--accent);
+}
+
+.cta {
+  margin-top: var(--sp-6);
+}
+
+.resume {
+  margin-top: var(--sp-6);
+  max-width: 520px;
+}
+
+.resume p {
+  margin-top: var(--sp-2);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: var(--sp-4);
+  margin-top: var(--sp-7);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--border);
+}
+
+.stats dt {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.03em;
+}
+
+.stats dd {
+  font-size: var(--text-xs);
+  color: var(--ink-3);
+  margin-top: 2px;
+}
+
+/* ---- Journey ------------------------------------------------------------- */
+
+.journey {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+
+.journey li {
+  margin: 0;
+  position: relative;
+}
+
+.journey a {
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr) auto auto;
+  gap: var(--sp-4);
+  align-items: center;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  text-decoration: none;
+  transition:
+    border-color var(--dur) var(--ease),
+    background var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+.journey a:hover {
+  border-color: var(--accent-line);
+  background: var(--surface-2);
+  transform: translateX(3px);
+}
+
+.journey .stage {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--ink-3);
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.15rem 0;
+}
+
+.journey a:hover .stage {
+  color: var(--accent);
+  border-color: var(--accent-line);
+}
+
+.journey .body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.journey strong {
+  font-size: var(--text-base);
+  font-weight: 500;
+}
+
+.journey small {
+  font-size: var(--text-xs);
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.journey .count {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.journey .link {
+  display: block;
+  width: 1px;
+  height: 10px;
+  margin-left: 2.1rem;
+  background: var(--border-strong);
+}
+
+@media (max-width: 680px) {
+  .journey a {
+    grid-template-columns: 2.2rem minmax(0, 1fr);
+    grid-template-areas: 'stage body' '. meta';
+  }
+
+  .journey .count,
+  .journey .level {
+    display: none;
+  }
+}
+
+/* ---- Profile path -------------------------------------------------------- */
+
+.path {
+  margin-top: var(--sp-5);
+}
+
+.order {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: var(--sp-4) 0;
+}
+
+.order li {
+  margin: 0;
+}
+
+.order a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0.3rem 0.65rem;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  font-size: var(--text-xs);
+  text-decoration: none;
+}
+
+.order a:hover {
+  border-color: var(--accent-line);
+  color: var(--accent);
+}
+
+.order .n {
+  font-family: var(--font-mono);
+  color: var(--ink-3);
+}
+
+.path .note {
+  margin-bottom: var(--sp-4);
+}
+
+/* ---- Capability cards ---------------------------------------------------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  color: var(--accent);
+  margin-bottom: var(--sp-3);
+}
+
+.six {
+  margin: var(--sp-3) 0;
+  color: var(--ink-2);
+  font-size: var(--text-base);
+}
+
+.courses {
+  list-style: none;
+  padding: 0;
+  margin: var(--sp-4) 0;
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.courses li {
+  margin: 0;
+}
+
+.courses a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--text-base);
+  color: var(--ink);
+  text-decoration-color: var(--accent-line);
+}
+
+.courses a:hover {
+  color: var(--accent);
+}
+
+/* ---- Closing ------------------------------------------------------------- */
+
+.closing {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-5);
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-2);
+}
+
+.closing p {
+  margin-top: var(--sp-2);
+}

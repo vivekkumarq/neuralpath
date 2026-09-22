@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vivekkumarq.github.io/neuralpath/sitemap.xml

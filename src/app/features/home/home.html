@@ -1,0 +1,237 @@
+<section class="hero">
+  <div class="container">
+    <p class="eyebrow">Vivek Kumar · AI/ML Engineering Resource</p>
+
+    <h1>Learn AI.<br />Build intelligence.<br /><span class="accent">Engineer the future.</span></h1>
+
+    <p class="lede">
+      A structured path from machine learning fundamentals to modern LLM and AI engineering —
+      {{ stats.modules }} stages, {{ stats.topics }} topics, and the reasoning behind each one.
+      No account, no backend, nothing to install.
+    </p>
+
+    <div class="row cta">
+      @if (progress.nextTopic(); as next) {
+        <a class="btn btn-primary" [routerLink]="['/learn', next.module, next.slug]">
+          {{ started() ? 'Continue learning' : 'Start learning' }}
+          <app-icon name="arrow-right" [size]="16" />
+        </a>
+      }
+      <a class="btn" routerLink="/roadmap">Explore roadmap</a>
+      <a class="btn btn-ghost" routerLink="/interview">AI/ML interview prep</a>
+    </div>
+
+    @if (started()) {
+      <div class="resume">
+        <div class="bar"><span [style.width.%]="progress.overallPercent()"></span></div>
+        <p class="dim">
+          {{ progress.overallPercent() }}% complete · {{ progress.completedCount() }} of
+          {{ stats.topics }} topics · currently in
+          <a [routerLink]="['/learn', progress.currentStage().slug]">{{
+            progress.currentStage().title
+          }}</a>
+        </p>
+      </div>
+    }
+
+    <dl class="stats">
+      <div>
+        <dt>{{ stats.topics }}</dt>
+        <dd>topics</dd>
+      </div>
+      <div>
+        <dt>{{ questionCount }}</dt>
+        <dd>interview questions</dd>
+      </div>
+      <div>
+        <dt>{{ projectCount }}</dt>
+        <dd>projects</dd>
+      </div>
+      <div>
+        <dt>{{ termCount }}</dt>
+        <dd>glossary terms</dd>
+      </div>
+      <div>
+        <dt>{{ stats.visuals }}</dt>
+        <dd>interactive figures</dd>
+      </div>
+      <div>
+        <dt>~{{ hours }}h</dt>
+        <dd>of reading</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<section class="section container" id="journey">
+  <div class="section-head">
+    <p class="eyebrow">The learning journey</p>
+    <h2>Sixteen stages, in dependency order</h2>
+    <p>
+      Each stage exists because the previous one runs out. Select any stage to jump in — the
+      curriculum does not force a single route, but this is the order that avoids gaps.
+    </p>
+  </div>
+
+  <ol class="journey" role="list">
+    @for (module of modules; track module.slug; let i = $index) {
+      <li>
+        <a [routerLink]="['/learn', module.slug]">
+          <span class="stage">{{ module.stage }}</span>
+          <span class="body">
+            <strong>{{ module.title }}</strong>
+            <small>{{ module.tagline }}</small>
+          </span>
+          <span class="count">{{ module.topics.length }} topics</span>
+          <span class="level level-{{ module.level }}">{{ module.level }}</span>
+        </a>
+        @if (i < modules.length - 1) {
+          <span class="link" aria-hidden="true"></span>
+        }
+      </li>
+    }
+  </ol>
+</section>
+
+<section class="section container">
+  <div class="section-head">
+    <p class="eyebrow">Start here</p>
+    <h2>I am a…</h2>
+    <p>
+      Pick the closest description and the roadmap reorders itself around it. Stored in this browser
+      only, and you can change it whenever you like.
+    </p>
+  </div>
+
+  <div class="tag-list">
+    @for (entry of profiles; track entry.id) {
+      <button
+        type="button"
+        class="chip"
+        [attr.aria-pressed]="progress.activeProfile() === entry.id"
+        (click)="chooseProfile(entry.id)"
+      >
+        {{ entry.label }}
+      </button>
+    }
+  </div>
+
+  @if (profile(); as chosen) {
+    <div class="card path reveal">
+      <p class="muted">{{ chosen.description }}</p>
+      <ol class="order" role="list">
+        @for (module of recommended(); track module.slug; let i = $index) {
+          <li>
+            <a [routerLink]="['/learn', module.slug]">
+              <span class="n">{{ i + 1 }}</span>
+              {{ module.title }}
+            </a>
+          </li>
+        }
+      </ol>
+      <p class="note note-tip">{{ chosen.note }}</p>
+      <a class="btn btn-sm" routerLink="/dashboard">
+        See the full path
+        <app-icon name="arrow-right" [size]="14" />
+      </a>
+    </div>
+  } @else {
+    <div class="empty">
+      Nothing selected. If you are completely new, the honest answer is:
+      <strong>Python → mathematics → data → machine learning → deep learning → NLP →
+      transformers → LLMs → RAG → agents</strong>, in that order.
+    </div>
+  }
+</section>
+
+<section class="section container">
+  <div class="section-head">
+    <p class="eyebrow">What is inside</p>
+    <h2>Built to be used, not skimmed</h2>
+  </div>
+
+  <div class="grid cols-2">
+    @for (item of capabilities; track item.title) {
+      <article class="card">
+        <span class="badge"><app-icon [name]="item.icon" [size]="18" /></span>
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.body }}</p>
+      </article>
+    }
+  </div>
+</section>
+
+<section class="section container">
+  <div class="grid cols-2">
+    <article class="card">
+      <p class="eyebrow">Every topic answers six questions</p>
+      <ol class="six">
+        <li>What is it?</li>
+        <li>Why does it exist — what problem does it solve?</li>
+        <li>How does it work?</li>
+        <li>Where is it used in practice?</li>
+        <li>What should you learn before it?</li>
+        <li>What comes after it?</li>
+      </ol>
+      <p class="dim">
+        If a topic cannot answer all six, it is not finished. That constraint is why this reads like
+        an engineering handbook rather than a collection of notes.
+      </p>
+    </article>
+
+    <article class="card">
+      <p class="eyebrow">Recommended learning resource</p>
+      <h3>Courses worth pairing with this</h3>
+      <p>
+        The structure here was shaped partly by two external courses. The content on this site is
+        original and stands alone — you do not need either to use it — but if you want video
+        instruction alongside the written material, both are solid.
+      </p>
+      <ul class="courses" role="list">
+        <li>
+          <a
+            href="https://www.udemy.com/course/the-ai-engineer-course-complete-ai-engineer-bootcamp/"
+            target="_blank"
+            rel="noopener"
+          >
+            The AI Engineer Course: Complete AI Engineer Bootcamp
+            <app-icon name="external" [size]="13" />
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://www.udemy.com/course/llm-engineering-master-ai-and-large-language-models/"
+            target="_blank"
+            rel="noopener"
+          >
+            LLM Engineering: Master AI and Large Language Models
+            <app-icon name="external" [size]="13" />
+          </a>
+        </li>
+      </ul>
+      <p class="dim">
+        External paid courses on Udemy, published by their own authors. Not affiliated with this
+        site. See <a routerLink="/resources">Resources</a> for the free alternatives.
+      </p>
+    </article>
+  </div>
+</section>
+
+<section class="section container">
+  <div class="card closing">
+    <div>
+      <h2>Ready when you are</h2>
+      <p class="muted">
+        Start at the beginning, jump to the stage you need, or press
+        <kbd class="kbd">Ctrl</kbd> <kbd class="kbd">K</kbd> and search for anything.
+      </p>
+    </div>
+    <div class="row">
+      <a class="btn btn-primary" routerLink="/learn">Browse every topic</a>
+      <button type="button" class="btn" (click)="ui.openPalette()">
+        <app-icon name="search" [size]="15" />
+        Search
+      </button>
+    </div>
+  </div>
+</section>

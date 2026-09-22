@@ -1,0 +1,10 @@
+{
+  "name": "NeuralPath — AI/ML Engineering",
+  "short_name": "NeuralPath",
+  "description": "A structured path from machine learning fundamentals to LLM and AI engineering.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0a0d12",
+  "theme_color": "#0a0d12",
+  "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

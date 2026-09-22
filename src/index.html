@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+    <title>NeuralPath — AI/ML Engineering by Vivek Kumar</title>
+    <meta
+      name="description"
+      content="A structured path from machine learning fundamentals to modern LLM and AI engineering: roadmap, concepts, interactive diagrams, projects and interview preparation."
+    />
+    <meta name="author" content="Vivek Kumar" />
+    <meta name="theme-color" content="#0a0d12" />
+    <meta name="color-scheme" content="dark light" />
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="manifest" href="manifest.webmanifest" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+
+    <script>
+      // Apply the stored appearance before first paint so there is no flash of
+      // the wrong theme on load.
+      (function () {
+        var read = function (key, allowed, fallback) {
+          try {
+            var raw = localStorage.getItem('neuralpath:v1:' + key);
+            var value = raw ? JSON.parse(raw) : fallback;
+            return allowed.indexOf(value) === -1 ? fallback : value;
+          } catch (e) {
+            return fallback;
+          }
+        };
+
+        var mode = read('theme', ['system', 'light', 'dark'], 'dark');
+        if (mode === 'system') {
+          try {
+            mode = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+          } catch (e) {
+            mode = 'dark';
+          }
+        }
+
+        var root = document.documentElement;
+        root.setAttribute('data-theme', mode);
+        root.style.colorScheme = mode;
+        if (read('focus', [true, false], false) === true) root.setAttribute('data-focus', 'on');
+      })();
+    </script>
+  </head>
+  <body>
+    <app-root></app-root>
+    <noscript>
+      NeuralPath is an interactive curriculum and needs JavaScript. The full topic outline is in the
+      project README on GitHub.
+    </noscript>
+  </body>
+</html>
