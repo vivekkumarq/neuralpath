@@ -12,6 +12,7 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="grid-wrap">
+      <div class="table-scroll">
       <table>
         <caption class="dim">Adjust any count. Metrics update immediately.</caption>
         <thead>
@@ -54,6 +55,7 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
           </tr>
         </tbody>
       </table>
+      </div>
 
       <ul class="metrics" role="list">
         @for (metric of metrics(); track metric.label) {
@@ -94,10 +96,30 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
       }
     }
 
+    /* The matrix has a floor width below which the inputs stop being usable,
+     * so on a narrow phone it scrolls inside its own box rather than pushing
+     * the page sideways. */
+    .table-scroll {
+      overflow-x: auto;
+      border-radius: var(--radius);
+    }
+
     table {
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
+      min-width: 320px;
+    }
+
+    @media (max-width: 420px) {
+      th,
+      td {
+        padding: 0.35rem 0.4rem;
+      }
+
+      label span {
+        width: 1.3rem;
+      }
     }
 
     caption {

@@ -89,6 +89,15 @@ import { Logo } from '../shared/logo';
         }
       </div>
 
+      <button
+        type="button"
+        class="icon-btn search-compact"
+        (click)="ui.openPalette()"
+        aria-label="Search"
+      >
+        <app-icon name="search" [size]="17" />
+      </button>
+
       <span class="spacer"></span>
 
       <button
@@ -259,13 +268,23 @@ import { Logo } from '../shared/logo';
       }
     }
 
-    @media (max-width: 640px) {
-      .search-wrap .kbd {
+    .search-compact {
+      display: none;
+    }
+
+    /* Below this the inline field cannot fit beside the brand and the controls,
+     * so search collapses to a button that opens the palette instead. */
+    @media (max-width: 720px) {
+      .search-wrap {
         display: none;
       }
 
-      .search-wrap {
-        max-width: none;
+      .search-compact {
+        display: inline-flex;
+      }
+
+      .brand {
+        margin-right: auto;
       }
     }
   `,
