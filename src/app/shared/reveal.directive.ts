@@ -38,6 +38,13 @@ export class Reveal implements OnDestroy {
 
     if (reduced || typeof IntersectionObserver === 'undefined') return;
 
+    // Anything already on screen when the page loads is shown immediately.
+    // Fading in content the reader is already looking at is noise, and it
+    // leaves the top of the page blank in screenshots, print and any context
+    // where the transition never runs.
+    const box = this.host.nativeElement.getBoundingClientRect();
+    if (box.top < window.innerHeight) return;
+
     this.armed = true;
     this.observer = new IntersectionObserver(
       (entries) => {

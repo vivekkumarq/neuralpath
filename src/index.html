@@ -25,32 +25,35 @@
     />
 
     <script>
-      // Apply the stored appearance before first paint so there is no flash of
-      // the wrong theme on load.
+      // Apply the stored appearance before first paint, so there is no flash of
+      // the wrong theme, typeface or text size. Kept in sync with
+      // core/services/appearance.service.ts.
       (function () {
-        var read = function (key, allowed, fallback) {
+        var read = function (key, fallback) {
           try {
             var raw = localStorage.getItem('neuralpath:v1:' + key);
-            var value = raw ? JSON.parse(raw) : fallback;
-            return allowed.indexOf(value) === -1 ? fallback : value;
+            return raw ? JSON.parse(raw) : fallback;
           } catch (e) {
             return fallback;
           }
         };
 
-        var mode = read('theme', ['system', 'light', 'dark'], 'dark');
-        if (mode === 'system') {
-          try {
-            mode = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-          } catch (e) {
-            mode = 'dark';
-          }
-        }
+        var themes = ['dark','light','carbon','midnight','nord','dracula','forest','ocean','solarized','sepia','contrast'];
+        var light = ['light','solarized','sepia'];
+        var sizes = ['s','m','l','xl'];
+
+        var theme = read('theme', 'dark');
+        if (themes.indexOf(theme) === -1) theme = 'dark';
+        var size = read('size', 'm');
+        if (sizes.indexOf(size) === -1) size = 'm';
+        var font = read('font', 'inter');
 
         var root = document.documentElement;
-        root.setAttribute('data-theme', mode);
-        root.style.colorScheme = mode;
-        if (read('focus', [true, false], false) === true) root.setAttribute('data-focus', 'on');
+        root.setAttribute('data-theme', theme);
+        root.setAttribute('data-font', typeof font === 'string' ? font : 'inter');
+        root.setAttribute('data-size', size);
+        root.style.colorScheme = light.indexOf(theme) === -1 ? 'dark' : 'light';
+        if (read('focus', false) === true) root.setAttribute('data-focus', 'on');
       })();
     </script>
   </head>

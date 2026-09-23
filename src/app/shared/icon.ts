@@ -43,6 +43,8 @@ const PATHS: Record<string, string> = {
   clock: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 2',
   filter: 'M4 5h16l-6 7v6l-4 2v-8z',
   up: 'M12 19V5M6 11l6-6 6 6',
+  type: 'M4 7V5h16v2M9 19h6M12 5v14',
+  palette: 'M12 3a9 9 0 1 0 0 18 2 2 0 0 0 1.6-3.2 2 2 0 0 1 1.6-3.2H18a3 3 0 0 0 3-3A9 9 0 0 0 12 3zM7.5 11.5h.01M10.5 7.5h.01M15 7.5h.01',
 };
 
 @Component({

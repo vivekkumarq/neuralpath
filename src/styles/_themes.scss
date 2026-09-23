@@ -1,0 +1,299 @@
+/* Palettes.
+ *
+ * Every theme sets the same variable contract, so a palette is a single mixin
+ * call rather than a sweep through component styles. The ids here must match
+ * THEMES in core/services/appearance.service.ts.
+ */
+
+@mixin palette(
+  $bg,
+  $bg-soft,
+  $surface,
+  $surface-2,
+  $surface-3,
+  $border,
+  $border-strong,
+  $ink,
+  $ink-2,
+  $ink-3,
+  $accent,
+  $accent-ink,
+  $info,
+  $warn,
+  $danger,
+  $dark: true
+) {
+  color-scheme: if($dark, dark, light);
+
+  --bg: #{$bg};
+  --bg-soft: #{$bg-soft};
+  --surface: #{$surface};
+  --surface-2: #{$surface-2};
+  --surface-3: #{$surface-3};
+  --border: #{$border};
+  --border-strong: #{$border-strong};
+
+  --ink: #{$ink};
+  --ink-2: #{$ink-2};
+  --ink-3: #{$ink-3};
+  --ink-inverse: #{if($dark, $bg, #ffffff)};
+
+  --accent: #{$accent};
+  --accent-ink: #{$accent-ink};
+  --accent-soft: #{rgba($accent, 0.14)};
+  --accent-line: #{rgba($accent, 0.42)};
+
+  --info: #{$info};
+  --info-soft: #{rgba($info, 0.14)};
+  --warn: #{$warn};
+  --warn-soft: #{rgba($warn, 0.14)};
+  --danger: #{$danger};
+  --danger-soft: #{rgba($danger, 0.14)};
+
+  --lvl-beginner: #{if($dark, #4ade80, #15803d)};
+  --lvl-intermediate: #{if($dark, #facc15, #a16207)};
+  --lvl-advanced: #{if($dark, #fb923c, #c2410c)};
+  --lvl-expert: #{if($dark, #f87171, #b91c1c)};
+
+  --shadow: #{if(
+      $dark,
+      (0 1px 2px rgba(0, 0, 0, 0.5), 0 12px 32px -18px rgba(0, 0, 0, 0.9)),
+      (0 1px 2px rgba(16, 21, 29, 0.06), 0 10px 30px -20px rgba(16, 21, 29, 0.35))
+    )};
+  --grid-line: #{if($dark, rgba(255, 255, 255, 0.035), rgba(16, 21, 29, 0.04))};
+}
+
+/* Graphite — the default identity. */
+:root,
+[data-theme='dark'] {
+  @include palette(
+    #0a0d12,
+    #0e1219,
+    #121722,
+    #171d2a,
+    #1d2532,
+    #222b3a,
+    #303c50,
+    #e8edf5,
+    #aab6c8,
+    #7b8799,
+    #4fe3c1,
+    #052620,
+    #6aa6ff,
+    #f5b661,
+    #ff7a7a
+  );
+}
+
+/* Paper — warm neutral, not an inversion of the dark theme. */
+[data-theme='light'] {
+  @include palette(
+    #fcfcfd,
+    #f4f6f9,
+    #ffffff,
+    #f4f6f9,
+    #eaeef4,
+    #e0e6ee,
+    #c6d0dd,
+    #10151d,
+    #475264,
+    #6b7688,
+    #0d7a68,
+    #ffffff,
+    #2563eb,
+    #b45309,
+    #c02626,
+    $dark: false
+  );
+}
+
+/* Carbon — true black, for OLED and for people who want maximum contrast. */
+[data-theme='carbon'] {
+  @include palette(
+    #000000,
+    #070707,
+    #0c0c0c,
+    #141414,
+    #1c1c1c,
+    #232323,
+    #343434,
+    #f2f2f2,
+    #b5b5b5,
+    #808080,
+    #22d3ee,
+    #04212a,
+    #7dd3fc,
+    #fbbf24,
+    #f87171
+  );
+}
+
+/* Midnight — deep indigo. */
+[data-theme='midnight'] {
+  @include palette(
+    #0a0a18,
+    #0e0e21,
+    #14142c,
+    #1a1a38,
+    #222247,
+    #262650,
+    #383870,
+    #e9e8ff,
+    #b0aede,
+    #7d7bb0,
+    #a78bfa,
+    #14082c,
+    #7dd3fc,
+    #fbbf24,
+    #fb7185
+  );
+}
+
+/* Nord — cool slate. */
+[data-theme='nord'] {
+  @include palette(
+    #2e3440,
+    #333a47,
+    #3b4252,
+    #434c5e,
+    #4c566a,
+    #4a5468,
+    #616e88,
+    #eceff4,
+    #d8dee9,
+    #9aa6b8,
+    #88c0d0,
+    #1b2430,
+    #81a1c1,
+    #ebcb8b,
+    #bf616a
+  );
+}
+
+/* Dracula. */
+[data-theme='dracula'] {
+  @include palette(
+    #282a36,
+    #2d2f3d,
+    #343746,
+    #3c3f51,
+    #44475a,
+    #454862,
+    #5c608a,
+    #f8f8f2,
+    #d5d3e0,
+    #9c9ab3,
+    #bd93f9,
+    #21212c,
+    #8be9fd,
+    #ffb86c,
+    #ff5555
+  );
+}
+
+/* Forest — muted green, low glare. */
+[data-theme='forest'] {
+  @include palette(
+    #0a1210,
+    #0e1a17,
+    #12231f,
+    #172d27,
+    #1e3a32,
+    #1f3b33,
+    #2f5a4d,
+    #e6f4ee,
+    #a9c7bb,
+    #77958a,
+    #4fd1a5,
+    #04241a,
+    #7dd3fc,
+    #eab308,
+    #f87171
+  );
+}
+
+/* Solarized Light. */
+[data-theme='solarized'] {
+  @include palette(
+    #fdf6e3,
+    #f5eed8,
+    #fffbf0,
+    #f3ebd6,
+    #eae1c9,
+    #e5dcc3,
+    #c9bfa3,
+    #073642,
+    #4a5f66,
+    #7d8f92,
+    #12658f,
+    #ffffff,
+    #268bd2,
+    #b58900,
+    #dc322f,
+    $dark: false
+  );
+}
+
+/* Sepia — paper-like, for long reading. */
+[data-theme='sepia'] {
+  @include palette(
+    #f3ece1,
+    #ece3d5,
+    #fbf6ee,
+    #eee5d8,
+    #e5dac9,
+    #ded2c0,
+    #bcab94,
+    #2c2318,
+    #57493a,
+    #85735f,
+    #a2542e,
+    #ffffff,
+    #1f6f8b,
+    #a16207,
+    #b02b2b,
+    $dark: false
+  );
+}
+
+/* Ocean — deep blue. */
+[data-theme='ocean'] {
+  @include palette(
+    #061018,
+    #0a1722,
+    #0e2130,
+    #13293b,
+    #193448,
+    #1a3648,
+    #2a5470,
+    #e3f2fb,
+    #a3bed1,
+    #71899b,
+    #38bdf8,
+    #032030,
+    #7dd3fc,
+    #fbbf24,
+    #fb7185
+  );
+}
+
+/* Contrast — maximum legibility. */
+[data-theme='contrast'] {
+  @include palette(
+    #000000,
+    #0a0a0a,
+    #121212,
+    #1a1a1a,
+    #242424,
+    #3a3a3a,
+    #5c5c5c,
+    #ffffff,
+    #e0e0e0,
+    #b0b0b0,
+    #ffd400,
+    #000000,
+    #66d9ff,
+    #ffb000,
+    #ff6b6b
+  );
+}

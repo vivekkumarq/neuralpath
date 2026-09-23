@@ -1,40 +1,59 @@
 import { Injectable, signal } from '@angular/core';
 
-/** Shared chrome state: the mobile drawer and the command palette. */
+/** Shared chrome state: the sidebar, the command palette and the appearance panel. */
 @Injectable({ providedIn: 'root' })
 export class UiService {
-  private readonly drawer = signal(false);
+  private readonly sidebar = signal(true);
   private readonly palette = signal(false);
+  private readonly appearance = signal(false);
   private readonly wide = signal(true);
+  private readonly stages = signal(new Set<string>());
 
-  readonly drawerOpen = this.drawer.asReadonly();
+  readonly sidebarOpen = this.sidebar.asReadonly();
   readonly paletteOpen = this.palette.asReadonly();
-  /** True once there is room for the sidebar and the table of contents. */
+  readonly appearanceOpen = this.appearance.asReadonly();
+  /** True once there is room for the sidebar beside the content. */
   readonly isWide = this.wide.asReadonly();
+  /** Stages the reader has expanded by hand, on top of the current one. */
+  readonly openStages = this.stages.asReadonly();
 
   constructor() {
     if (typeof window === 'undefined' || !window.matchMedia) return;
-    const query = window.matchMedia('(min-width: 1080px)');
+
+    const query = window.matchMedia('(min-width: 1001px)');
     this.wide.set(query.matches);
+    // On a phone the sidebar is a drawer, so it starts closed.
+    this.sidebar.set(query.matches);
+
     query.addEventListener('change', (event) => {
       this.wide.set(event.matches);
-      if (event.matches) this.closeDrawer();
+      this.sidebar.set(event.matches);
+      this.lockScroll(false);
     });
   }
 
-  toggleDrawer(): void {
-    this.drawer.update((open) => !open);
-    this.lockScroll(this.drawer());
+  toggleSidebar(): void {
+    this.sidebar.update((open) => !open);
+    if (!this.wide()) this.lockScroll(this.sidebar());
   }
 
-  closeDrawer(): void {
-    if (!this.drawer()) return;
-    this.drawer.set(false);
+  closeSidebar(): void {
+    if (!this.sidebar()) return;
+    this.sidebar.set(false);
     this.lockScroll(false);
   }
 
+  /** Following a link on a phone should dismiss the drawer; on desktop it stays. */
+  closeSidebarOnMobile(): void {
+    if (!this.wide()) this.closeSidebar();
+  }
+
+  markStageOpen(slug: string): void {
+    this.stages.update((set) => new Set(set).add(slug));
+  }
+
   openPalette(): void {
-    this.closeDrawer();
+    this.closeAppearance();
     this.palette.set(true);
     this.lockScroll(true);
   }
@@ -48,6 +67,14 @@ export class UiService {
   togglePalette(): void {
     if (this.palette()) this.closePalette();
     else this.openPalette();
+  }
+
+  toggleAppearance(): void {
+    this.appearance.update((open) => !open);
+  }
+
+  closeAppearance(): void {
+    this.appearance.set(false);
   }
 
   private lockScroll(locked: boolean): void {

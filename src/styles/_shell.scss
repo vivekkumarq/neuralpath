@@ -1,0 +1,324 @@
+/* The application shell: fixed topbar, persistent sidebar, scrolling main.
+ *
+ * The layout is a documentation app rather than a marketing page — navigation
+ * stays on screen, so a reader can move between topics without going back to
+ * an index.
+ */
+
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.app-shell[data-sidebar='hidden'] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* ---- Topbar --------------------------------------------------------------- */
+
+.topbar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 70;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding-inline: var(--sp-3);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar .spacer {
+  flex: 1;
+}
+
+.icon-btn {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  color: var(--ink-2);
+  background: transparent;
+  flex: none;
+  transition:
+    background var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+
+.icon-btn:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+  border-color: var(--border);
+}
+
+.icon-btn[aria-expanded='true'],
+.icon-btn.on {
+  color: var(--accent);
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+}
+
+/* ---- Sidebar -------------------------------------------------------------- */
+
+.sidebar {
+  grid-column: 1;
+  position: sticky;
+  top: var(--header-h);
+  height: calc(100vh - var(--header-h));
+  margin-top: var(--header-h);
+  border-right: 1px solid var(--border);
+  background: var(--bg-soft);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  z-index: 40;
+}
+
+.sidebar-inner {
+  padding: var(--sp-4) var(--sp-2) var(--sp-6) var(--sp-3);
+}
+
+.sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-2) var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.nav-tree {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1px;
+}
+
+.nav-group,
+.nav-leaves,
+.nav-section {
+  min-width: 0;
+}
+
+.nav-group > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0.4rem var(--sp-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  list-style: none;
+  color: var(--ink-2);
+  font-size: var(--text-sm);
+}
+
+.nav-group > summary::-webkit-details-marker {
+  display: none;
+}
+
+.nav-group > summary:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.nav-group[open] > summary {
+  color: var(--ink);
+}
+
+.nav-group .caret {
+  transition: transform var(--dur) var(--ease);
+  color: var(--ink-3);
+  flex: none;
+}
+
+.nav-group[open] .caret {
+  transform: rotate(90deg);
+}
+
+.nav-group .stage-no {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--ink-3);
+  flex: none;
+  width: 1.2rem;
+}
+
+.nav-group .name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav-group .done-count {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--ink-3);
+  flex: none;
+  min-width: 2.1rem;
+  text-align: right;
+}
+
+.nav-leaves {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1px;
+  margin: 2px 0 var(--sp-2) 0.95rem;
+  padding-left: var(--sp-2);
+  border-left: 1px solid var(--border);
+}
+
+.nav-leaves a {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  padding: 0.3rem var(--sp-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  color: var(--ink-3);
+  text-decoration: none;
+  line-height: 1.45;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* A real element rather than a bare text node: an anonymous flex item cannot
+ * take min-width, so a long title would refuse to shrink and spill out of the
+ * sidebar instead of wrapping. */
+.nav-leaves .leaf-label {
+  min-width: 0;
+  flex: 1;
+}
+
+.nav-leaves a:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.nav-leaves a.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.nav-leaves a .tick {
+  flex: none;
+  opacity: 0;
+  color: var(--accent);
+}
+
+.nav-leaves a.done .tick {
+  opacity: 1;
+}
+
+.nav-section {
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1px;
+}
+
+.nav-section a {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 0.4rem var(--sp-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.nav-section a:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.nav-section a.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* ---- Main ----------------------------------------------------------------- */
+
+.app-main {
+  grid-column: 2;
+  min-width: 0;
+  padding-top: var(--header-h);
+}
+
+.app-shell[data-sidebar='hidden'] .app-main {
+  grid-column: 1;
+}
+
+/* ---- Mobile --------------------------------------------------------------- */
+
+@media (max-width: 1000px) {
+  .app-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar {
+    position: fixed;
+    top: var(--header-h);
+    bottom: 0;
+    left: 0;
+    width: min(300px, 84vw);
+    margin-top: 0;
+    height: auto;
+    transform: translateX(-100%);
+    transition: transform 240ms var(--ease-out);
+    box-shadow: var(--shadow);
+  }
+
+  .sidebar.open {
+    transform: none;
+  }
+
+  .app-main {
+    grid-column: 1;
+  }
+
+  .sidebar-scrim {
+    position: fixed;
+    inset: var(--header-h) 0 0;
+    z-index: 35;
+    background: rgba(0, 0, 0, 0.5);
+    animation: fade-in 160ms var(--ease) both;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Focus mode collapses the shell to the article. */
+[data-focus='on'] .sidebar,
+[data-focus='on'] .app-footer {
+  display: none;
+}
+
+[data-focus='on'] .app-shell {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+[data-focus='on'] .app-main {
+  grid-column: 1;
+}

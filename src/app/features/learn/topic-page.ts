@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input } f
 import { RouterLink } from '@angular/router';
 import { ProgressService } from '../../core/services/progress.service';
 import { SeoService } from '../../core/services/seo.service';
-import { ThemeService } from '../../core/services/theme.service';
+import { AppearanceService } from '../../core/services/appearance.service';
 import { moduleBySlug, neighbours, topicBySlug } from '../../data/curriculum';
 import { BookmarkButton } from '../../shared/bookmark-button';
 import { ContentBlocks } from '../../shared/content-blocks';
@@ -55,8 +55,8 @@ import { Icon } from '../../shared/icon';
               <button
                 type="button"
                 class="btn btn-sm"
-                [attr.aria-pressed]="theme.focusMode()"
-                (click)="theme.toggleFocus()"
+                [attr.aria-pressed]="appearance.focusMode()"
+                (click)="appearance.toggleFocus()"
               >
                 <app-icon name="focus" [size]="14" />
                 Focus
@@ -368,7 +368,7 @@ export class TopicPage {
   readonly slug = input<string>('');
 
   protected readonly progress = inject(ProgressService);
-  protected readonly theme = inject(ThemeService);
+  protected readonly appearance = inject(AppearanceService);
   private readonly seo = inject(SeoService);
 
   protected readonly topic = computed(() => topicBySlug(this.slug()));

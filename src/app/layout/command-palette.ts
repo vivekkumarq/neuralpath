@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { SearchResult, SearchService } from '../core/services/search.service';
-import { ThemeService } from '../core/services/theme.service';
+import { AppearanceService } from '../core/services/appearance.service';
 import { UiService } from '../core/services/ui.service';
 import { ALL_NAV } from '../data/navigation';
 import { GITHUB_URL } from '../core/services/seo.service';
@@ -240,7 +240,7 @@ export class CommandPalette {
   protected readonly ui = inject(UiService);
   protected readonly search = inject(SearchService);
   private readonly router = inject(Router);
-  private readonly theme = inject(ThemeService);
+  private readonly appearance = inject(AppearanceService);
 
   private readonly box = viewChild<ElementRef<HTMLInputElement>>('box');
 
@@ -262,11 +262,20 @@ export class CommandPalette {
       run: () => this.navigate(link.path),
     })),
     {
+      label: 'Open appearance settings',
+      hint: 'Theme, typeface and text size',
+      icon: 'type',
+      run: () => {
+        this.ui.closePalette();
+        this.ui.toggleAppearance();
+      },
+    },
+    {
       label: 'Toggle theme',
       hint: 'Dark and light',
       icon: 'moon',
       run: () => {
-        this.theme.toggle();
+        this.appearance.toggleDark();
         this.ui.closePalette();
       },
     },
@@ -275,7 +284,7 @@ export class CommandPalette {
       hint: 'Hide the chrome while reading',
       icon: 'focus',
       run: () => {
-        this.theme.toggleFocus();
+        this.appearance.toggleFocus();
         this.ui.closePalette();
       },
     },

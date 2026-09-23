@@ -37,8 +37,11 @@
   gap: var(--sp-4);
 }
 
+/* A wide minimum, so prose-carrying cards land at two columns on a desktop
+ * rather than auto-fitting to four and squeezing every heading onto three
+ * lines. Narrower grids use cols-3 or cols-4. */
 .cols-2 {
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
 }
 
 .cols-3 {
@@ -614,10 +617,10 @@ input[type='range'] {
  * motion is allowed, so there is no hidden content to rescue otherwise. */
 .will-reveal {
   opacity: 0;
-  transform: translateY(14px);
+  transform: translateY(10px);
   transition:
-    opacity 620ms var(--ease),
-    transform 620ms var(--ease);
+    opacity 420ms var(--ease),
+    transform 420ms var(--ease);
   transition-delay: var(--reveal-delay, 0ms);
 }
 
