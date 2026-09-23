@@ -330,5 +330,125 @@ def get_order_status(order_id: str, user_id: str) -> dict:
       ],
       related: ['security-and-privacy', 'observability-and-evals'],
     },
+    {
+      slug: 'orchestration-frameworks',
+      title: 'Orchestration frameworks: LangChain, LangGraph and MCP',
+      module: 'ai-agents',
+      level: 'advanced',
+      minutes: 9,
+      summary:
+        'What the frameworks actually give you — composition, state, persistence and a tool protocol — and when plain code is better.',
+      why: 'Frameworks save real time on plumbing and cost real time when you fight them. Knowing which problem each one solves is what lets you pick deliberately instead of by tutorial.',
+      prerequisites: ['agent-memory-and-state', 'structured-output-and-tools'],
+      outcomes: [
+        'Explain what LCEL composition buys over calling an API directly',
+        'Model an agent as a graph with explicit state and persistence',
+        'Decide when a framework is the wrong answer',
+      ],
+      tags: ['langchain', 'langgraph', 'mcp', 'orchestration'],
+      blocks: [
+        {
+          kind: 'table',
+          head: ['Layer', 'Problem it solves', 'What you give up'],
+          rows: [
+            ['LangChain (LCEL)', 'Composing prompt → model → parser as one runnable, with streaming and batching for free', 'A layer of indirection over a call you could write yourself'],
+            ['LangGraph', 'Explicit state, branching, cycles and checkpointed persistence for multi-step work', 'You model your agent as a graph, whether or not it is one'],
+            ['LlamaIndex', 'Ingestion, node parsing and retrieval strategies', 'Opinionated document model'],
+            ['MCP', 'One tool interface many clients can use, written once', 'A server to run and version'],
+            ['Plain code', 'Total control, no abstraction to debug through', 'You write the retries, streaming and state yourself'],
+          ],
+        },
+        { kind: 'heading', text: 'Composition' },
+        {
+          kind: 'text',
+          body: 'LCEL turns a chain into a single object with `invoke`, `batch` and `stream`. The value is not the syntax — it is that batching and streaming come for free at every step, and that a chain is swappable as a unit in tests.',
+        },
+        {
+          kind: 'code',
+          lang: 'python',
+          caption: 'A composed chain, then the same thing as a graph node',
+          code: `from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+
+prompt = ChatPromptTemplate.from_template(
+    "Classify this ticket. Return JSON with category and severity.\\n\\n{ticket}"
+)
+chain = prompt | model | JsonOutputParser()
+
+chain.invoke({"ticket": "checkout 502s on mobile"})
+chain.batch([{"ticket": t} for t in backlog])     # batching, unchanged code
+for piece in chain.stream({"ticket": text}):      # streaming, unchanged code
+    ...`,
+        },
+        { kind: 'heading', text: 'State and persistence' },
+        {
+          kind: 'text',
+          body: 'LangGraph makes the thing that matters explicit: a typed state object, nodes that update it, edges that decide what runs next, and a checkpointer that writes state after every node. That last part is what makes a long run resumable and auditable — the property that separates an agent you can operate from one you can only demo.',
+        },
+        {
+          kind: 'code',
+          lang: 'python',
+          caption: 'State, nodes, a conditional edge and a checkpointer',
+          code: `from typing import Annotated, TypedDict
+
+from langgraph.checkpoint.sqlite import SqliteSaver
+from langgraph.graph import END, StateGraph
+from langgraph.graph.message import add_messages
+
+
+class State(TypedDict):
+    messages: Annotated[list, add_messages]   # reducer: append, do not replace
+    attempts: int
+
+
+builder = StateGraph(State)
+builder.add_node("decide", decide)
+builder.add_node("act", run_tools)
+builder.set_entry_point("decide")
+builder.add_conditional_edges("decide", lambda s: "act" if pending(s) else END)
+builder.add_edge("act", "decide")
+
+# Every node transition is checkpointed against a thread id, so a crash
+# resumes where it stopped instead of restarting the task.
+graph = builder.compile(checkpointer=SqliteSaver.from_conn_string("runs.db"))
+graph.invoke({"messages": [("user", goal)], "attempts": 0},
+             config={"configurable": {"thread_id": "ticket-4821"}})`,
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'Write it plainly first',
+          body: 'Build the loop with the provider SDK and a dictionary of state. When the plumbing — streaming, retries, persistence, branching — starts to dominate the file, adopt the framework that solves that specific problem. Adopting first means debugging your logic through someone else’s abstraction from day one.',
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'Frameworks move faster than your code',
+          body: 'These libraries make breaking changes often. Pin versions, keep the model calls behind your own thin interface, and make sure a framework swap does not mean rewriting the application.',
+        },
+        {
+          kind: 'quiz',
+          quiz: {
+            id: 'orch-1',
+            prompt: 'Your agent must survive a process restart mid-task and be auditable afterwards. What does that require?',
+            options: [
+              'A larger context window',
+              'Checkpointed state keyed by a thread id, written after each step',
+              'A faster model',
+              'More tools',
+            ],
+            answer: 1,
+            explanation:
+              'Durability is a storage property, not a model property. Checkpointing after each node gives you both resumption and a step-by-step record of what happened.',
+          },
+        },
+      ],
+      resources: [
+        { label: 'LangGraph documentation', url: 'https://langchain-ai.github.io/langgraph/', kind: 'docs' },
+        { label: 'LangChain Expression Language', url: 'https://python.langchain.com/docs/concepts/lcel/', kind: 'docs' },
+        { label: 'Model Context Protocol', url: 'https://modelcontextprotocol.io/', kind: 'docs' },
+      ],
+      related: ['agent-memory-and-state', 'tool-calling'],
+    },
   ],
 };

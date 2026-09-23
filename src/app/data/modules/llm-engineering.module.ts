@@ -360,5 +360,208 @@ spec = REGISTRY["support.answer"]
       ],
       related: ['latency-throughput-and-cost', 'observability-and-evals'],
     },
+    {
+      slug: 'hugging-face-ecosystem',
+      title: 'Hugging Face and running open models',
+      module: 'llm-engineering',
+      level: 'intermediate',
+      minutes: 9,
+      summary:
+        'Pipelines, tokenizers and AutoModel, the model hub, and what changes when the model runs on your own hardware.',
+      why: 'Open weights are the alternative to a metered API: no per-token cost, no data leaving your network, and full control of the version. The price is that serving, memory and throughput become your problem — and Hugging Face is where almost all of it starts.',
+      prerequisites: ['pytorch-and-frameworks', 'tokens-and-context'],
+      outcomes: [
+        'Run a model three ways: pipeline, AutoModel, and a local server',
+        'Read a model card and judge whether a model fits your constraints',
+        'Estimate the memory a given model needs before downloading it',
+      ],
+      tags: ['hugging face', 'transformers', 'ollama', 'open models'],
+      blocks: [
+        {
+          kind: 'text',
+          body: 'The library has three levels, and picking the right one saves a lot of code. **`pipeline`** is one line for a standard task. **`AutoTokenizer` + `AutoModel`** gives you the tensors when you need control. A **served endpoint** (vLLM, TGI, Ollama) is what you use when the model has to answer many requests rather than run in a script.',
+        },
+        {
+          kind: 'code',
+          lang: 'python',
+          caption: 'The same model, three levels of control',
+          code: `from transformers import AutoModelForSequenceClassification, AutoTokenizer, pipeline
+
+# 1. Pipeline — tokenisation, batching and decoding handled for you.
+classify = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
+print(classify("The migration finished three days early."))
+# [{'label': 'POSITIVE', 'score': 0.9998}]
+
+# 2. Tokenizer + model — when you need logits, embeddings or custom batching.
+name = "distilbert-base-uncased-finetuned-sst-2-english"
+tok = AutoTokenizer.from_pretrained(name)
+model = AutoModelForSequenceClassification.from_pretrained(name)
+
+batch = tok(["ships on time", "broke immediately"], padding=True, return_tensors="pt")
+logits = model(**batch).logits          # (2, 2) — raw scores, not probabilities
+print(logits.softmax(-1).round(decimals=3))`,
+        },
+        {
+          kind: 'code',
+          lang: 'bash',
+          caption: '3. A local server, for anything that serves traffic',
+          code: `# Ollama: simplest path to a local chat model
+ollama pull llama3.2
+ollama run llama3.2 "Summarise this changelog in three bullets"
+
+# vLLM: an OpenAI-compatible endpoint with continuous batching
+vllm serve meta-llama/Llama-3.1-8B-Instruct --max-model-len 8192
+
+curl http://localhost:8000/v1/chat/completions \\
+  -H "Content-Type: application/json" \\
+  -d '{"model": "meta-llama/Llama-3.1-8B-Instruct",
+       "messages": [{"role": "user", "content": "hello"}]}'`,
+        },
+        { kind: 'heading', text: 'Will it fit?' },
+        {
+          kind: 'table',
+          head: ['Precision', 'Bytes per parameter', '7B model', '70B model'],
+          rows: [
+            ['fp32', '4', '~28 GB', '~280 GB'],
+            ['fp16 / bf16', '2', '~14 GB', '~140 GB'],
+            ['8-bit', '1', '~7 GB', '~70 GB'],
+            ['4-bit', '0.5', '~3.5 GB', '~35 GB'],
+          ],
+          caption: 'Weights only. Add the KV cache, which grows with context length and concurrency, and headroom for activations.',
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'Read the model card before the benchmark table',
+          body: 'The card carries the licence, the training data description, the intended use and the known limitations. A model that benchmarks well and forbids commercial use is not a candidate, and finding that out after integration is an expensive way to learn it.',
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'A downloaded model is executable content',
+          body: 'Prefer `safetensors` over pickle-based checkpoints, which can run arbitrary code on load. Pin revisions rather than tracking `main`, so a model you audited is the model you serve.',
+        },
+        {
+          kind: 'quiz',
+          quiz: {
+            id: 'hf-1',
+            prompt: 'You have a 24 GB GPU and want to serve a 70B model. What is the realistic option?',
+            options: [
+              'Load it in fp16',
+              'Quantise to 4-bit and accept a quality trade-off, or use a smaller model',
+              'Increase the batch size',
+              'Use a longer context window',
+            ],
+            answer: 1,
+            explanation:
+              '70B at fp16 needs roughly 140 GB for weights alone. Even at 4-bit it is about 35 GB, still beyond one 24 GB card — so it is multi-GPU, a smaller model, or a hosted API.',
+          },
+        },
+      ],
+      resources: [
+        { label: 'Hugging Face Transformers documentation', url: 'https://huggingface.co/docs/transformers/index', kind: 'docs' },
+        { label: 'Ollama', url: 'https://ollama.com/', kind: 'tool' },
+        { label: 'safetensors', url: 'https://huggingface.co/docs/safetensors/index', kind: 'docs' },
+      ],
+      related: ['model-selection-and-cost', 'serving-and-inference'],
+    },
+    {
+      slug: 'model-selection-and-cost',
+      title: 'Choosing a model: quality, latency and cost',
+      module: 'llm-engineering',
+      level: 'advanced',
+      minutes: 8,
+      summary:
+        'Frontier against open weights, benchmarks against your own evaluation, and the arithmetic that decides.',
+      why: 'Model choice is the single biggest lever on both quality and the bill, and it is usually made on a leaderboard screenshot. The decision is a measurement on your own task, against your own latency and cost budget.',
+      prerequisites: ['genai-evaluation', 'llm-apis-and-parameters'],
+      outcomes: [
+        'Run a fair bake-off between candidate models',
+        'Read a public benchmark without over-trusting it',
+        'Compute the break-even point between a hosted API and self-hosting',
+      ],
+      tags: ['model selection', 'benchmarks', 'cost', 'routing'],
+      blocks: [
+        {
+          kind: 'table',
+          head: ['', 'Frontier API', 'Open weights, hosted', 'Open weights, self-hosted'],
+          rows: [
+            ['Quality ceiling', 'Highest today', 'Close on many tasks', 'Same as hosted, your tuning'],
+            ['Cost shape', 'Per token', 'Per token, usually lower', 'Per GPU-hour, busy or idle'],
+            ['Data path', 'Leaves your network', 'Leaves your network', 'Stays inside it'],
+            ['Version control', "Provider's schedule", 'You pin it', 'You pin it'],
+            ['Fine-tuning', 'Limited, provider-specific', 'Full', 'Full'],
+            ['Operational load', 'None', 'Low', 'Real — GPUs, upgrades, scaling'],
+          ],
+        },
+        { kind: 'heading', text: 'Benchmarks are a filter, not a decision' },
+        {
+          kind: 'list',
+          items: [
+            '**Contamination** — public benchmark items leak into training data, so scores drift upward without capability changing.',
+            '**Distribution** — a model strong on competition mathematics may be mediocre at your extraction schema.',
+            '**Aggregation** — a single headline number hides the subtask you actually care about.',
+            '**Use them to shortlist** three candidates, then decide on your own eval set. That set is the deliverable; the leaderboard is a hint.',
+          ],
+        },
+        {
+          kind: 'code',
+          lang: 'python',
+          caption: 'A bake-off that produces a decision table',
+          code: `import time
+
+CANDIDATES = ["small-fast", "large-capable", "open-8b-local"]
+
+def bake_off(cases):
+    for model in CANDIDATES:
+        scores, latencies, tokens = [], [], 0
+
+        for case in cases:
+            started = time.perf_counter()
+            reply = call(model, case.prompt)
+            latencies.append(time.perf_counter() - started)
+            tokens += reply.usage.total
+            scores.append(grade(reply.text, case))   # your rubric, not a vibe
+
+        latencies.sort()
+        print(f"{model:>14}  quality {sum(scores)/len(scores):.3f}"
+              f"  p95 {latencies[int(len(latencies) * 0.95)]:.2f}s"
+              f"  cost/1k {price(model, tokens) / len(cases) * 1000:.2f}")`,
+        },
+        {
+          kind: 'math',
+          expr: 'break-even monthly tokens ≈ (GPU hours × hourly rate) / API price per token',
+          note: 'Include engineering time and on-call in the GPU side. Self-hosting usually wins on steady high volume and loses on spiky low volume.',
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'Route rather than choose',
+          body: 'Most products do not need one model. Classification, routing and extraction go to a small fast model; analysis and generation go to a capable one. That split is typically a larger saving than any provider negotiation, and it needs the same eval set to keep honest.',
+        },
+        {
+          kind: 'quiz',
+          quiz: {
+            id: 'sel-1',
+            prompt: 'A model tops the leaderboard but scores worse than a smaller one on your 40-case eval set. What do you ship?',
+            options: [
+              'The leaderboard leader — the benchmark covers more ground',
+              'The one that wins on your eval set, because it measures your actual task',
+              'Both, alternating',
+              'Neither; wait for the next release',
+            ],
+            answer: 1,
+            explanation:
+              'A benchmark measures an average over tasks that are not yours. Your eval set is the only measurement of the job you are paying the model to do.',
+          },
+        },
+      ],
+      resources: [
+        { label: 'Hugging Face open LLM leaderboards', url: 'https://huggingface.co/open-llm-leaderboard', kind: 'tool' },
+        { label: 'LMSYS Chatbot Arena', url: 'https://lmarena.ai/', kind: 'tool' },
+        { label: 'Anthropic model overview', url: 'https://docs.anthropic.com/en/docs/about-claude/models/overview', kind: 'docs' },
+      ],
+      related: ['latency-throughput-and-cost', 'genai-evaluation'],
+    },
   ],
 };

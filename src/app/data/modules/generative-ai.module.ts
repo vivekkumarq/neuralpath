@@ -342,5 +342,108 @@ def extract(text: str, attempts: int = 2) -> Extraction:
       ],
       related: ['rag-evaluation', 'observability-and-evals'],
     },
+    {
+      slug: 'multimodal-and-speech',
+      title: 'Beyond text: vision, speech and image generation',
+      module: 'generative-ai',
+      level: 'intermediate',
+      minutes: 10,
+      summary:
+        'Images as model input, speech to text and back, and how diffusion models generate pictures.',
+      why: 'Most real documents are not plain text — they are scans, screenshots, recordings and photographs. Handling them is often the difference between a demo on clean data and a system that works on what the business actually has.',
+      prerequisites: ['foundation-models', 'transfer-learning-and-vits'],
+      outcomes: [
+        'Send an image to a vision-language model and know what it can and cannot read',
+        'Build a transcription pipeline and judge its errors',
+        'Explain diffusion in terms of noise added and removed',
+      ],
+      tags: ['multimodal', 'whisper', 'diffusion', 'speech'],
+      blocks: [
+        { kind: 'heading', text: 'Images as input' },
+        {
+          kind: 'text',
+          body: 'A vision-language model encodes an image into the same token space as text, so a picture and a question about it sit in one context. That makes document understanding, screenshot debugging and chart reading possible without a bespoke pipeline — and it is the practical replacement for a lot of traditional OCR work.',
+        },
+        {
+          kind: 'table',
+          head: ['Task', 'Handled well', 'Still fragile'],
+          rows: [
+            ['Reading a document scan', 'Layout, headings, paragraphs, tables', 'Dense small print, handwriting, stamps'],
+            ['Charts and diagrams', 'Trend and label extraction', 'Precise values without gridlines'],
+            ['Screenshots', 'UI description, error text', 'Pixel-exact coordinates'],
+            ['Photographs', 'Objects, scene, text in the image', 'Counting many similar objects'],
+          ],
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'Images are untrusted input too',
+          body: 'Text inside an image reaches the model as instructions just as readily as text in the prompt. A screenshot containing "ignore previous instructions" is an injection vector, so the same tool-permission rules apply.',
+        },
+        { kind: 'heading', text: 'Speech' },
+        {
+          kind: 'code',
+          lang: 'python',
+          caption: 'Transcription with Whisper, then a summary of the transcript',
+          code: `from transformers import pipeline
+
+transcribe = pipeline(
+    "automatic-speech-recognition",
+    model="openai/whisper-small",
+    chunk_length_s=30,             # long audio is processed in windows
+    return_timestamps=True,
+)
+
+result = transcribe("standup-2026-09-21.m4a")
+
+for chunk in result["chunks"][:3]:
+    start, end = chunk["timestamp"]
+    print(f"[{start:6.1f}-{end:6.1f}] {chunk['text'].strip()}")
+
+summary = llm(f"Summarise the decisions in this transcript:\\n{result['text']}")`,
+        },
+        {
+          kind: 'list',
+          items: [
+            '**Word error rate** is the metric — substitutions, insertions and deletions over reference words. Below about 10% is usable for summarising; below 5% for quoting.',
+            '**Domain vocabulary** is where it fails: product names, drug names, acronyms. Bias the decoder with a prompt containing the expected terms.',
+            '**Diarisation** — who spoke when — is a separate model, not a Whisper feature.',
+            '**Text to speech** is the return path, and the same rule applies: the voice you clone needs consent.',
+          ],
+        },
+        { kind: 'heading', text: 'Image generation' },
+        {
+          kind: 'text',
+          body: 'A diffusion model is trained by adding noise to images in small steps until they are pure static, then learning to reverse one step at a time. To generate, it starts from noise and denoises repeatedly, guided by a text embedding. Latent diffusion does this in a compressed space rather than on pixels, which is why it runs on consumer hardware.',
+        },
+        {
+          kind: 'math',
+          expr: 'noise → denoise ×N, guided by the prompt embedding → image',
+          note: 'More steps means more refinement and more time. Guidance scale trades prompt adherence against variety.',
+        },
+        {
+          kind: 'quiz',
+          quiz: {
+            id: 'mm-1',
+            prompt: 'A transcript gets your product name wrong every time. Cheapest effective fix?',
+            options: [
+              'Fine-tune the speech model',
+              'Prompt the decoder with the expected vocabulary, and correct known terms in post-processing',
+              'Record at a higher bitrate',
+              'Switch to a larger model and accept the cost',
+            ],
+            answer: 1,
+            explanation:
+              'Rare proper nouns are the standard failure of a general speech model. Biasing the decoder and applying a domain term list fixes most of it for almost nothing, before any retraining is justified.',
+          },
+        },
+      ],
+      resources: [
+        { label: 'Whisper paper', url: 'https://arxiv.org/abs/2212.04356', kind: 'paper' },
+        { label: 'Hugging Face Diffusers', url: 'https://huggingface.co/docs/diffusers/index', kind: 'docs' },
+        { label: 'High-Resolution Image Synthesis with Latent Diffusion Models', url: 'https://arxiv.org/abs/2112.10752', kind: 'paper' },
+      ],
+      related: ['transfer-learning-and-vits', 'hugging-face-ecosystem'],
+    },
   ],
 };

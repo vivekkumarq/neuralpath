@@ -312,5 +312,122 @@ for i, row in enumerate(X.toarray()):
       ],
       related: ['self-attention', 'transformer-architecture'],
     },
+    {
+      slug: 'classical-nlp-tasks',
+      title: 'Classical NLP tasks: tagging, entities and topics',
+      module: 'nlp',
+      level: 'intermediate',
+      minutes: 9,
+      summary:
+        'Part-of-speech tagging, named-entity recognition, sentiment and topic modelling — the tasks still solved without a language model.',
+      why: 'Not every text problem needs an LLM. Extracting company names from ten million filings, or discovering what a support backlog is about, is faster, cheaper and more predictable with a purpose-built pipeline — and these tasks are the vocabulary of most NLP job descriptions.',
+      prerequisites: ['text-preprocessing', 'bag-of-words-and-tfidf'],
+      outcomes: [
+        'Run POS tagging and named-entity recognition over real text',
+        'Choose between a classical pipeline and an LLM for a given task',
+        'Discover themes in an unlabelled corpus with topic modelling',
+      ],
+      tags: ['spacy', 'ner', 'topic modelling', 'sentiment'],
+      blocks: [
+        {
+          kind: 'table',
+          head: ['Task', 'Output', 'Classical tool', 'When an LLM wins'],
+          rows: [
+            ['POS tagging', 'A grammatical tag per token', 'spaCy, NLTK', 'Almost never — this is solved'],
+            ['Named-entity recognition', 'Spans labelled person, org, place, date', 'spaCy, Stanza', 'Rare or domain-specific entity types with no training data'],
+            ['Sentiment', 'Polarity, or a label per aspect', 'Fine-tuned classifier, VADER', 'Sarcasm, mixed opinions, aspect-level nuance'],
+            ['Topic modelling', 'Clusters of co-occurring terms', 'LDA, NMF, BERTopic', 'You need named themes rather than word clusters'],
+            ['Summarisation', 'Shorter text', 'Extractive sentence scoring', 'Almost always — this is what LLMs are good at'],
+          ],
+        },
+        {
+          kind: 'text',
+          body: 'The rule of thumb: **a task with a fixed, well-defined output space and high volume belongs to a classical pipeline**. A task needing world knowledge, tone or open-ended generation belongs to a language model. A tagger processes thousands of documents a second on a laptop; an LLM call takes a second and costs money.',
+        },
+        {
+          kind: 'code',
+          lang: 'python',
+          caption: 'Tagging and entity extraction with spaCy',
+          code: `import spacy
+
+nlp = spacy.load("en_core_web_sm")
+doc = nlp("Priya joined Acme Systems in Bangalore in March 2024 to work on API tooling.")
+
+for token in doc[:5]:
+    print(f"{token.text:<12} {token.pos_:<6} {token.lemma_}")
+# Priya        PROPN  Priya
+# joined       VERB   join
+# Acme         PROPN  Acme
+# Systems      PROPN  Systems
+# in           ADP    in
+
+for ent in doc.ents:
+    print(ent.text, "->", ent.label_)
+# Priya -> PERSON
+# Acme Systems -> ORG
+# Bangalore -> GPE
+# March 2024 -> DATE`,
+        },
+        { kind: 'heading', text: 'Topic modelling' },
+        {
+          kind: 'text',
+          body: 'Topic modelling finds groups of words that co-occur across documents. **LDA** treats each document as a mixture of topics and each topic as a distribution over words. **BERTopic** clusters sentence embeddings instead, which usually produces more coherent topics on short text. Neither names the topics for you — you read the top terms and decide what they mean, which is where the work is.',
+        },
+        {
+          kind: 'code',
+          lang: 'python',
+          caption: 'Themes in a support backlog, without labels',
+          code: `from sklearn.decomposition import LatentDirichletAllocation
+from sklearn.feature_extraction.text import CountVectorizer
+
+vec = CountVectorizer(stop_words="english", min_df=5, max_df=0.4)
+counts = vec.fit_transform(tickets)
+
+lda = LatentDirichletAllocation(n_components=6, random_state=0).fit(counts)
+terms = vec.get_feature_names_out()
+
+for i, topic in enumerate(lda.components_):
+    top = [terms[j] for j in topic.argsort()[-6:][::-1]]
+    print(f"topic {i}: {', '.join(top)}")
+
+# topic 0: refund, payment, card, declined, charge, failed
+# topic 1: login, password, reset, email, locked, account`,
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'Topic count is a judgement, not a result',
+          body: 'LDA returns exactly the number of topics you ask for, on any corpus, including noise. Try several, read the top terms, and keep the one a domain expert recognises. Coherence scores help rank candidates but do not settle it.',
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'The hybrid that usually wins',
+          body: 'Use a classical pipeline to filter and route at volume, then spend LLM calls only on what survives. Extract entities with spaCy, cluster with embeddings, and ask a model to name the clusters — one call instead of a million.',
+        },
+        {
+          kind: 'quiz',
+          quiz: {
+            id: 'nlp-5',
+            prompt: 'You must extract organisation names from 40 million filings, nightly. Which approach?',
+            options: [
+              'An LLM call per document',
+              'A named-entity recognition model, with an LLM only for the cases it flags as uncertain',
+              'Regular expressions',
+              'Topic modelling',
+            ],
+            answer: 1,
+            explanation:
+              'At that volume, per-document LLM calls are unaffordable and slow. NER is purpose-built, runs locally at thousands of documents a second, and reserves the expensive model for the hard remainder.',
+          },
+        },
+      ],
+      resources: [
+        { label: 'spaCy linguistic features', url: 'https://spacy.io/usage/linguistic-features', kind: 'docs' },
+        { label: 'scikit-learn topic extraction example', url: 'https://scikit-learn.org/stable/auto_examples/applications/plot_topics_extraction_with_nmf_lda.html', kind: 'docs' },
+        { label: 'BERTopic documentation', url: 'https://maartengr.github.io/BERTopic/', kind: 'tool' },
+      ],
+      related: ['word-embeddings', 'hugging-face-ecosystem'],
+    },
   ],
 };

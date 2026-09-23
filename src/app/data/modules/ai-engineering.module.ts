@@ -361,5 +361,98 @@ def traced_answer(question: str, user_id: str) -> dict:
       ],
       related: ['agent-reliability', 'observability-and-evals'],
     },
+    {
+      slug: 'shipping-an-ai-interface',
+      title: 'Shipping the interface: streaming, state and trust',
+      module: 'ai-engineering',
+      level: 'intermediate',
+      minutes: 8,
+      summary:
+        'Gradio and Streamlit for a demo, a real front end for a product, and the interaction patterns a stochastic system needs.',
+      why: 'A model behind a curl command convinces nobody. The interface is where an AI feature is judged, and generative output needs patterns ordinary UI does not: visible waiting, citations, correction and an escape hatch.',
+      prerequisites: ['serving-and-inference', 'structured-output-and-tools'],
+      outcomes: [
+        'Stand up a demo interface in minutes with the right tool',
+        'Stream a response and keep the interface honest while it waits',
+        'Design for the case where the model is wrong',
+      ],
+      tags: ['gradio', 'streamlit', 'streaming', 'ux'],
+      blocks: [
+        {
+          kind: 'table',
+          head: ['Tool', 'Good for', 'Stops being right when'],
+          rows: [
+            ['Gradio', 'A shareable demo of a model, in one file', 'You need auth, routing or a designed layout'],
+            ['Streamlit', 'Internal tools and dashboards with real widgets', 'The rerun-on-interaction model fights you'],
+            ['FastAPI + a front end', 'Anything customer facing', 'Never — this is the destination'],
+            ['Notebook', 'Your own exploration', 'You show it to someone else'],
+          ],
+        },
+        {
+          kind: 'code',
+          lang: 'python',
+          caption: 'A streaming chat demo in a dozen lines',
+          code: `import gradio as gr
+
+
+def respond(message: str, history: list[dict]):
+    # Yielding progressively is what makes the wait tolerable: the reader
+    # sees the first token in ~1s instead of the whole answer in ~8s.
+    partial = ""
+    for piece in client.stream(messages=history + [{"role": "user", "content": message}]):
+        partial += piece
+        yield partial
+
+
+gr.ChatInterface(
+    respond,
+    type="messages",
+    title="Support assistant",
+    description="Answers from the product documentation, with sources.",
+    examples=["How do I rotate an API key?", "Why did my webhook retry?"],
+).launch()`,
+        },
+        { kind: 'heading', text: 'Patterns a generative interface needs' },
+        {
+          kind: 'list',
+          items: [
+            '**Stream, always.** Time to first token is the perceived speed. A spinner for eight seconds feels broken; text appearing in one second does not.',
+            '**Show the sources.** A cited answer can be checked. An uncited one has to be trusted, and it should not be.',
+            '**Make the failure visible.** "I could not find this in the documentation" is a good answer. A confident fabrication is a bug you shipped.',
+            '**Offer the correction.** Thumbs down plus a free-text box is the cheapest evaluation data you will ever collect — and it feeds the eval set directly.',
+            '**Keep an escape hatch.** A route to a human, or to a plain search, for the cases the model cannot serve.',
+            '**Never lose the input.** If a request fails, the text the reader typed must still be there.',
+          ],
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'A demo URL is a production surface',
+          body: 'Gradio’s `share=True` publishes a public tunnel to your machine with your API keys behind it. Use it for a colleague and shut it down; anything that outlives the conversation needs authentication and rate limiting like any other endpoint.',
+        },
+        {
+          kind: 'quiz',
+          quiz: {
+            id: 'ui-1',
+            prompt: 'Users say the assistant feels slow, though total response time is unchanged at 6s. What helps most?',
+            options: [
+              'A faster model',
+              'Stream the response so the first tokens appear in about a second',
+              'A nicer spinner',
+              'Shorter answers',
+            ],
+            answer: 1,
+            explanation:
+              'Perceived speed is time to first token. Streaming changes the experience without changing the total time — which is why it is the first thing to add, not the last.',
+          },
+        },
+      ],
+      resources: [
+        { label: 'Gradio documentation', url: 'https://www.gradio.app/docs', kind: 'docs' },
+        { label: 'Streamlit documentation', url: 'https://docs.streamlit.io/', kind: 'docs' },
+        { label: 'Server-sent events (MDN)', url: 'https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events', kind: 'docs' },
+      ],
+      related: ['serving-and-inference', 'latency-throughput-and-cost'],
+    },
   ],
 };
