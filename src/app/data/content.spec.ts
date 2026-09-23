@@ -35,6 +35,10 @@ const KNOWN_VISUALS = [
   'adaptation-compare',
   'agent-loop',
   'tree-splits',
+  'backprop',
+  'training-curve',
+  'kmeans',
+  'threshold',
 ];
 
 describe('curriculum', () => {

@@ -355,6 +355,11 @@ print(model.predict(["claim your free prize now"]))  # [1]`,
           kind: 'text',
           body: 'K-means minimises within-cluster variance by alternating two steps: assign each point to the nearest centroid, then move each centroid to the mean of its points. It is fast and it will happily split one elongated cluster into three, because its notion of a cluster is a sphere.',
         },
+        {
+          kind: 'visual',
+          id: 'kmeans',
+          caption: 'Assign, move, repeat — until assignments stop changing.',
+        },
         { kind: 'heading', text: 'PCA' },
         {
           kind: 'text',

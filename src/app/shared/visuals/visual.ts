@@ -11,6 +11,12 @@ import {
   TransformerVisual,
 } from './llm.visuals';
 import {
+  BackpropVisual,
+  KMeansVisual,
+  ThresholdVisual,
+  TrainingCurveVisual,
+} from './animated.visuals';
+import {
   AdaptationCompareVisual,
   AgentLoopVisual,
   RagPipelineVisual,
@@ -45,6 +51,10 @@ import {
     VectorSearchVisual,
     AdaptationCompareVisual,
     AgentLoopVisual,
+    BackpropVisual,
+    TrainingCurveVisual,
+    KMeansVisual,
+    ThresholdVisual,
   ],
   template: `
     <figure>
@@ -100,6 +110,18 @@ import {
           }
           @case ('agent-loop') {
             <app-viz-agent-loop />
+          }
+          @case ('backprop') {
+            <app-viz-backprop />
+          }
+          @case ('training-curve') {
+            <app-viz-training-curve />
+          }
+          @case ('kmeans') {
+            <app-viz-kmeans />
+          }
+          @case ('threshold') {
+            <app-viz-threshold />
           }
         }
       </div>

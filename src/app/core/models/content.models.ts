@@ -28,7 +28,11 @@ export type VisualId =
   | 'vector-search'
   | 'adaptation-compare'
   | 'agent-loop'
-  | 'tree-splits';
+  | 'tree-splits'
+  | 'backprop'
+  | 'training-curve'
+  | 'kmeans'
+  | 'threshold';
 
 export interface Quiz {
   /** Stable id so an answered quiz stays answered across visits. */

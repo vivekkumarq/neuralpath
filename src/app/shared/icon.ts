@@ -36,6 +36,7 @@ const PATHS: Record<string, string> = {
   refresh: 'M20 12a8 8 0 1 1-2.3-5.6M20 4v4h-4',
   dice: 'M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zM9 9h.01M15 15h.01M12 12h.01',
   play: 'M7 4l12 8-12 8z',
+  pause: 'M9 5v14M15 5v14',
   linkedin: 'M5 9v11M5 5.5h.01M10 20v-6a3 3 0 0 1 6 0v6M10 9.5V20',
   plus: 'M12 5v14M5 12h14',
   minus: 'M5 12h14',

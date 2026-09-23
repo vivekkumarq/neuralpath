@@ -51,6 +51,11 @@ export const evaluationModule: Module = {
           ],
         },
         {
+          kind: 'visual',
+          id: 'threshold',
+          caption: 'One dial. Move it and watch precision and recall pull apart.',
+        },
+        {
           kind: 'note',
           tone: 'info',
           title: 'Precision and recall trade against each other',

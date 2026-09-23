@@ -223,6 +223,11 @@ print(round(float(loss), 4), dW.ravel().round(4))   # 0.4741 [-0.3814 -0.7629]`,
         },
         { kind: 'heading', text: 'Two failure modes' },
         {
+          kind: 'visual',
+          id: 'backprop',
+          caption: 'Forward to the loss, then the same graph in reverse.',
+        },
+        {
           kind: 'table',
           head: ['Symptom', 'Cause', 'Fix'],
           rows: [
@@ -367,6 +372,11 @@ for epoch in range(epochs):
       ],
       tags: ['dropout', 'batch norm', 'layer norm', 'regularisation'],
       blocks: [
+        {
+          kind: 'visual',
+          id: 'training-curve',
+          caption: 'Watch validation loss turn while training loss keeps falling.',
+        },
         {
           kind: 'text',
           body: '**Dropout** zeroes a random fraction of activations during training, so no single unit can be relied on and the network is forced to spread its representation. It is disabled at inference — which is what `model.eval()` does, and forgetting it is a classic source of unstable predictions.',
