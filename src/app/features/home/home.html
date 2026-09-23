@@ -1,39 +1,47 @@
 <section class="hero">
-  <div class="container">
-    <p class="eyebrow">Vivek Kumar · AI/ML Engineering Resource</p>
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">Vivek Kumar · AI/ML Engineering Resource</p>
 
-    <h1>Learn AI.<br />Build intelligence.<br /><span class="accent">Engineer the future.</span></h1>
+      <h1>Learn AI.<br />Build intelligence.<br /><span class="accent">Engineer the future.</span></h1>
 
-    <p class="lede">
-      A structured path from machine learning fundamentals to modern LLM and AI engineering —
-      {{ stats.modules }} stages, {{ stats.topics }} topics, and the reasoning behind each one.
-      No account, no backend, nothing to install.
-    </p>
+      <p class="lede">
+        A structured path from machine learning fundamentals to modern LLM and AI engineering —
+        {{ stats.modules }} stages, {{ stats.topics }} topics, and the reasoning behind each one.
+        No account, no backend, nothing to install.
+      </p>
 
-    <div class="row cta">
-      @if (progress.nextTopic(); as next) {
-        <a class="btn btn-primary" [routerLink]="['/learn', next.module, next.slug]">
-          {{ started() ? 'Continue learning' : 'Start learning' }}
-          <app-icon name="arrow-right" [size]="16" />
-        </a>
+      <div class="row cta">
+        @if (progress.nextTopic(); as next) {
+          <a class="btn btn-primary" [routerLink]="['/learn', next.module, next.slug]">
+            {{ started() ? 'Continue learning' : 'Start learning' }}
+            <app-icon name="arrow-right" [size]="16" />
+          </a>
+        }
+        <a class="btn" routerLink="/roadmap">Explore roadmap</a>
+        <a class="btn btn-ghost" routerLink="/interview">AI/ML interview prep</a>
+      </div>
+
+      @if (started()) {
+        <div class="resume">
+          <div class="bar"><span [style.width.%]="progress.overallPercent()"></span></div>
+          <p class="dim">
+            {{ progress.overallPercent() }}% complete · {{ progress.completedCount() }} of
+            {{ stats.topics }} topics · currently in
+            <a [routerLink]="['/learn', progress.currentStage().slug]">{{
+              progress.currentStage().title
+            }}</a>
+          </p>
+        </div>
       }
-      <a class="btn" routerLink="/roadmap">Explore roadmap</a>
-      <a class="btn btn-ghost" routerLink="/interview">AI/ML interview prep</a>
     </div>
 
-    @if (started()) {
-      <div class="resume">
-        <div class="bar"><span [style.width.%]="progress.overallPercent()"></span></div>
-        <p class="dim">
-          {{ progress.overallPercent() }}% complete · {{ progress.completedCount() }} of
-          {{ stats.topics }} topics · currently in
-          <a [routerLink]="['/learn', progress.currentStage().slug]">{{
-            progress.currentStage().title
-          }}</a>
-        </p>
-      </div>
-    }
+    <div class="hero-figure">
+      <app-hero-figure />
+    </div>
+  </div>
 
+  <div class="container">
     <dl class="stats">
       <div>
         <dt>{{ stats.topics }}</dt>
@@ -75,19 +83,19 @@
 
   <ol class="journey" role="list">
     @for (module of modules; track module.slug; let i = $index) {
-      <li>
-        <a [routerLink]="['/learn', module.slug]">
-          <span class="stage">{{ module.stage }}</span>
-          <span class="body">
-            <strong>{{ module.title }}</strong>
-            <small>{{ module.tagline }}</small>
+      <li [appReveal]="(i % 4) * 60">
+        <a class="card-link" [routerLink]="['/learn', module.slug]">
+          <span class="top">
+            <span class="stage">{{ module.stage < 10 ? '0' + module.stage : module.stage }}</span>
+            <span class="level level-{{ module.level }}"></span>
           </span>
-          <span class="count">{{ module.topics.length }} topics</span>
-          <span class="level level-{{ module.level }}">{{ module.level }}</span>
+          <strong>{{ module.title }}</strong>
+          <small>{{ module.tagline }}</small>
+          <span class="foot">
+            <span class="count">{{ module.topics.length }} topics</span>
+            <app-icon name="arrow-right" [size]="13" />
+          </span>
         </a>
-        @if (i < modules.length - 1) {
-          <span class="link" aria-hidden="true"></span>
-        }
       </li>
     }
   </ol>
@@ -151,8 +159,8 @@
   </div>
 
   <div class="grid cols-2">
-    @for (item of capabilities; track item.title) {
-      <article class="card">
+    @for (item of capabilities; track item.title; let i = $index) {
+      <article class="card" [appReveal]="i * 70">
         <span class="badge"><app-icon [name]="item.icon" [size]="18" /></span>
         <h3>{{ item.title }}</h3>
         <p>{{ item.body }}</p>
@@ -163,7 +171,7 @@
 
 <section class="section container">
   <div class="grid cols-2">
-    <article class="card">
+    <article class="card" appReveal>
       <p class="eyebrow">Every topic answers six questions</p>
       <ol class="six">
         <li>What is it?</li>
@@ -179,7 +187,7 @@
       </p>
     </article>
 
-    <article class="card">
+    <article class="card" [appReveal]="80">
       <p class="eyebrow">Recommended learning resource</p>
       <h3>Courses worth pairing with this</h3>
       <p>

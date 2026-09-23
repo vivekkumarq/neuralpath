@@ -98,6 +98,22 @@
   margin-bottom: var(--sp-5);
 }
 
+/* A short accent rule above the eyebrow gives every section the same visual
+ * entry point without another wrapper element. */
+.section-head .eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.section-head .eyebrow::before {
+  content: '';
+  width: 18px;
+  height: 1px;
+  background: var(--accent);
+  flex: none;
+}
+
 .section-head h2 {
   margin-top: var(--sp-2);
 }
@@ -210,6 +226,7 @@ a.card,
   transition:
     border-color var(--dur) var(--ease),
     background var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
     transform var(--dur) var(--ease);
 }
 
@@ -218,6 +235,26 @@ a.card:hover,
   border-color: var(--accent-line);
   background: var(--surface-2);
   transform: translateY(-2px);
+  box-shadow: 0 10px 30px -18px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+/* A hairline of accent along the top edge, revealed on hover. Cheaper and
+ * calmer than a glow, and it survives both themes. */
+a.card::after,
+.card-link::after {
+  content: '';
+  position: absolute;
+  inset: -1px -1px auto;
+  height: 2px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease);
+}
+
+a.card:hover::after,
+.card-link:hover::after {
+  opacity: 0.9;
 }
 
 .card h3,
@@ -568,6 +605,29 @@ input[type='range'] {
     transform: translateY(8px);
   }
   to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Scroll reveal, applied by the Reveal directive. The class is only added when
+ * motion is allowed, so there is no hidden content to rescue otherwise. */
+.will-reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 620ms var(--ease),
+    transform 620ms var(--ease);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.will-reveal.is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .will-reveal {
     opacity: 1;
     transform: none;
   }

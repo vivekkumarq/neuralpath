@@ -8,11 +8,13 @@ import { PATH_PROFILES } from '../../data/now';
 import { ProgressService } from '../../core/services/progress.service';
 import { UiService } from '../../core/services/ui.service';
 import { Icon } from '../../shared/icon';
+import { Reveal } from '../../shared/reveal.directive';
+import { HeroFigure } from './hero-figure';
 
 @Component({
   selector: 'app-home',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, Icon],
+  imports: [RouterLink, Icon, Reveal, HeroFigure],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
