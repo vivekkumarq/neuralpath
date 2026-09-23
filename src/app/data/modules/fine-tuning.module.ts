@@ -187,6 +187,11 @@ export const fineTuningModule: Module = {
           note: 'For a 4096x4096 layer at rank 8, A and B hold 65,536 trainable values instead of 16.7 million — about 0.4%.',
         },
         {
+          kind: 'visual',
+          id: 'lora',
+          caption: 'Move the rank and watch the trainable share against the frozen matrix.',
+        },
+        {
           kind: 'table',
           head: ['Knob', 'Meaning', 'Guidance'],
           rows: [

@@ -32,7 +32,12 @@ export type VisualId =
   | 'backprop'
   | 'training-curve'
   | 'kmeans'
-  | 'threshold';
+  | 'threshold'
+  | 'rnn-unroll'
+  | 'chunking'
+  | 'lora'
+  | 'quantisation'
+  | 'drift';
 
 export interface Quiz {
   /** Stable id so an answered quiz stays answered across visits. */

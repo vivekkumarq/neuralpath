@@ -17,6 +17,13 @@ import {
   TrainingCurveVisual,
 } from './animated.visuals';
 import {
+  ChunkingVisual,
+  DriftVisual,
+  LoraVisual,
+  QuantisationVisual,
+  RnnUnrollVisual,
+} from './concept.visuals';
+import {
   AdaptationCompareVisual,
   AgentLoopVisual,
   RagPipelineVisual,
@@ -55,6 +62,11 @@ import {
     TrainingCurveVisual,
     KMeansVisual,
     ThresholdVisual,
+    RnnUnrollVisual,
+    ChunkingVisual,
+    LoraVisual,
+    QuantisationVisual,
+    DriftVisual,
   ],
   template: `
     <figure>
@@ -122,6 +134,21 @@ import {
           }
           @case ('threshold') {
             <app-viz-threshold />
+          }
+          @case ('rnn-unroll') {
+            <app-viz-rnn-unroll />
+          }
+          @case ('chunking') {
+            <app-viz-chunking />
+          }
+          @case ('lora') {
+            <app-viz-lora />
+          }
+          @case ('quantisation') {
+            <app-viz-quantisation />
+          }
+          @case ('drift') {
+            <app-viz-drift />
           }
         }
       </div>

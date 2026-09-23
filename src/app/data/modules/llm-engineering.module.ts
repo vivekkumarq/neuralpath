@@ -417,6 +417,11 @@ curl http://localhost:8000/v1/chat/completions \\
   -d '{"model": "meta-llama/Llama-3.1-8B-Instruct",
        "messages": [{"role": "user", "content": "hello"}]}'`,
         },
+        {
+          kind: 'visual',
+          id: 'quantisation',
+          caption: 'Fewer bits means a coarser grid of representable weights.',
+        },
         { kind: 'heading', text: 'Will it fit?' },
         {
           kind: 'table',

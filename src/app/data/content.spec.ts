@@ -39,6 +39,11 @@ const KNOWN_VISUALS = [
   'training-curve',
   'kmeans',
   'threshold',
+  'rnn-unroll',
+  'chunking',
+  'lora',
+  'quantisation',
+  'drift',
 ];
 
 describe('curriculum', () => {

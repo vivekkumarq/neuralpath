@@ -191,6 +191,11 @@ with mlflow.start_run(run_name="hgb-lr005"):
           body: 'Labels usually arrive late — sometimes months late — so you cannot monitor accuracy directly. Monitor proxies instead: input feature distributions against training, the distribution of predicted scores, the null and default rate per feature, and any immediate behavioural signal such as click-through or override rate.',
         },
         {
+          kind: 'visual',
+          id: 'drift',
+          caption: 'Eight weeks of a feature distribution sliding away from training.',
+        },
+        {
           kind: 'code',
           lang: 'python',
           caption: 'A cheap, dependency-free drift check',

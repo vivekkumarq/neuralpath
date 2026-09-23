@@ -272,6 +272,11 @@ for i, row in enumerate(X.toarray()):
           body: 'An RNN processes a sequence one step at a time, carrying a hidden state forward: `h_t = f(h_{t-1}, x_t)`. In principle that state summarises everything so far. In practice, backpropagating through many steps multiplies the same weights repeatedly, so the gradient vanishes and dependencies beyond a dozen or so steps are not learned.',
         },
         {
+          kind: 'visual',
+          id: 'rnn-unroll',
+          caption: 'Play it through: the state carries forward, then watch the gradient decay on the way back.',
+        },
+        {
           kind: 'text',
           body: '**LSTMs** add a cell state with input, forget and output gates, giving the network a learned choice about what to keep and what to discard. **GRUs** simplify this to two gates with similar performance. Both push the usable range out considerably — and neither removes the two structural problems.',
         },

@@ -125,6 +125,11 @@ export const ragModule: Module = {
           ],
         },
         {
+          kind: 'visual',
+          id: 'chunking',
+          caption: 'The same document split two ways. Switch modes and watch where the answer ends up.',
+        },
+        {
           kind: 'text',
           body: 'Reasonable defaults: **400–800 tokens** per chunk with **10–15% overlap**. Smaller chunks retrieve precisely and lose context; larger chunks carry context and dilute the embedding, because one vector has to represent several ideas.',
         },
