@@ -108,9 +108,34 @@ import { Visual } from './visuals/visual';
       gap: var(--sp-5);
     }
 
+    /* A section heading inside long prose needs a mark of its own, or it
+       reads as just another bold line. A short accent rule does it. */
     h3 {
-      margin-top: var(--sp-3);
+      position: relative;
+      margin-top: var(--sp-4);
+      padding-top: var(--sp-4);
       scroll-margin-top: calc(var(--header-h) + 1.5rem);
+      border-top: 1px solid var(--border);
+    }
+
+    h3::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 0;
+      width: 36px;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    :host > h3:first-child {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    :host > h3:first-child::before {
+      display: none;
     }
 
     .body {
@@ -181,13 +206,18 @@ import { Visual } from './visuals/visual';
     }
 
     .math {
-      border-left: 3px solid var(--accent-line);
-      padding: var(--sp-3) 0 var(--sp-3) var(--sp-4);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius);
+      background: var(--sunken);
+      box-shadow: var(--shadow-sm);
+      padding: var(--sp-4) var(--sp-5);
       max-width: var(--prose-max);
+      overflow-x: auto;
     }
 
     .math code {
-      font-size: var(--text-md);
+      font-size: var(--text-lg);
       background: none;
       border: none;
       padding: 0;

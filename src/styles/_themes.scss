@@ -55,12 +55,43 @@
   --lvl-advanced: #{if($dark, #fb923c, #c2410c)};
   --lvl-expert: #{if($dark, #f87171, #b91c1c)};
 
+  /* Depth. A surface reads as raised when it carries a light edge on top and
+   * drops a shadow below; every card, button and panel uses this pair. */
+  --hi: #{if($dark, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.9))};
+  --shadow-sm: #{if(
+      $dark,
+      (0 1px 2px rgba(0, 0, 0, 0.45)),
+      (0 1px 2px rgba(16, 21, 29, 0.05))
+    )};
   --shadow: #{if(
       $dark,
       (0 1px 2px rgba(0, 0, 0, 0.5), 0 12px 32px -18px rgba(0, 0, 0, 0.9)),
       (0 1px 2px rgba(16, 21, 29, 0.06), 0 10px 30px -20px rgba(16, 21, 29, 0.35))
     )};
-  --grid-line: #{if($dark, rgba(255, 255, 255, 0.035), rgba(16, 21, 29, 0.04))};
+  --shadow-lg: #{if(
+      $dark,
+      (0 2px 4px rgba(0, 0, 0, 0.4), 0 18px 40px -12px rgba(0, 0, 0, 0.75)),
+      (0 2px 4px rgba(16, 21, 29, 0.05), 0 18px 44px -16px rgba(16, 21, 29, 0.28))
+    )};
+  --shadow-accent: #{if(
+      $dark,
+      (0 1px 2px rgba(0, 0, 0, 0.5), 0 10px 26px -12px #{rgba($accent, 0.5)}),
+      (0 1px 2px rgba(16, 21, 29, 0.08), 0 10px 26px -14px #{rgba($accent, 0.55)})
+    )};
+
+  /* Page atmosphere: a wash of accent behind the fold and a hairline grid. */
+  --glow: #{rgba($accent, if($dark, 0.13, 0.09))};
+  --glow-2: #{rgba($info, if($dark, 0.09, 0.06))};
+  --grid-line: #{if($dark, rgba(255, 255, 255, 0.028), rgba(16, 21, 29, 0.035))};
+
+  /* Card fill: a barely-there vertical gradient reads better than a flat block. */
+  /* Light falls from above, so the lighter stop goes on top in either mode. */
+  --card-fill: linear-gradient(
+    180deg,
+    #{if($dark, $surface-2, $surface)} 0%,
+    #{if($dark, $surface, $surface-2)} 100%
+  );
+  --sunken: #{if($dark, $bg-soft, $surface-3)};
 }
 
 /* Graphite — the default identity. */

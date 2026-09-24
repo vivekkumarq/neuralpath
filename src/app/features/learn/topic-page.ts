@@ -192,7 +192,9 @@ import { Icon } from '../../shared/icon';
     }
 
     .head h1 {
-      margin-bottom: var(--sp-3);
+      margin-bottom: var(--sp-4);
+      font-size: var(--text-3xl);
+      letter-spacing: -0.04em;
     }
 
     .head .meta {
@@ -318,7 +320,7 @@ import { Icon } from '../../shared/icon';
     .toc ul {
       list-style: none;
       padding: 0;
-      margin-top: var(--sp-2);
+      margin-top: var(--sp-3);
       display: grid;
       gap: 0.15rem;
       border-left: 1px solid var(--border);

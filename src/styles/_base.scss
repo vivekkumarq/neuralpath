@@ -1,4 +1,4 @@
-/* Element defaults and the typographic scale used by every page. */
+/* Element defaults, the typographic scale, and the page atmosphere. */
 
 *,
 *::before,
@@ -13,7 +13,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
-  scroll-padding-top: calc(var(--header-h) + 1rem);
+  scroll-padding-top: calc(var(--header-h) + 1.5rem);
 }
 
 body {
@@ -21,11 +21,30 @@ body {
   color: var(--ink);
   font-family: var(--font-body);
   font-size: var(--text-base);
-  line-height: 1.65;
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis-weight: none;
   text-rendering: optimizeLegibility;
   min-height: 100vh;
   overflow-x: hidden;
+}
+
+/* The page is never a flat rectangle: a hairline grid gives the surface a
+ * scale, and two soft washes of colour sit behind the first screen. Fixed, so
+ * it costs one paint and never moves. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 40rem at 78% -8%, var(--glow), transparent 62%),
+    radial-gradient(45rem 32rem at 8% 2%, var(--glow-2), transparent 60%),
+    linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 100% 64px,
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 64px 100%;
+  mask-image: linear-gradient(180deg, #000 0%, #000 45%, transparent 92%);
 }
 
 h1,
@@ -34,8 +53,8 @@ h3,
 h4 {
   font-family: var(--font-display);
   font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  line-height: 1.14;
+  letter-spacing: var(--track-tight);
   color: var(--ink);
   text-wrap: balance;
 }
@@ -48,9 +67,13 @@ h2 {
 }
 h3 {
   font-size: var(--text-xl);
+  letter-spacing: var(--track-snug);
+  line-height: 1.25;
 }
 h4 {
   font-size: var(--text-lg);
+  letter-spacing: var(--track-snug);
+  line-height: 1.35;
 }
 
 p {
@@ -59,11 +82,14 @@ p {
 
 a {
   color: inherit;
+  text-decoration-thickness: 1px;
   text-decoration-color: var(--border-strong);
   text-underline-offset: 3px;
+  transition: color var(--dur) var(--ease), text-decoration-color var(--dur) var(--ease);
 }
 
 a:hover {
+  color: var(--accent);
   text-decoration-color: var(--accent);
 }
 
@@ -72,17 +98,18 @@ kbd,
 pre,
 samp {
   font-family: var(--font-mono);
-  font-size: 0.875em;
+  font-size: 0.855em;
   font-feature-settings: 'liga' 0;
 }
 
 :not(pre) > code {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
   border-radius: var(--radius-sm);
-  padding: 0.1em 0.38em;
+  padding: 0.12em 0.4em;
   color: var(--ink);
   white-space: nowrap;
+  font-weight: 500;
 }
 
 button,
@@ -108,23 +135,28 @@ svg {
 
 ul,
 ol {
-  padding-left: 1.25rem;
+  padding-left: 1.3rem;
 }
 
 li + li {
-  margin-top: 0.3rem;
+  margin-top: 0.4rem;
+}
+
+li::marker {
+  color: var(--ink-3);
 }
 
 hr {
   border: none;
-  border-top: 1px solid var(--border);
+  height: 1px;
+  background: linear-gradient(90deg, var(--border-strong), var(--border) 45%, transparent);
   margin: var(--sp-6) 0;
 }
 
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 ::selection {
@@ -146,6 +178,9 @@ hr {
   background: var(--border-strong);
   border-radius: 99px;
   border: 3px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-3);
 }
 
 .skip-link {

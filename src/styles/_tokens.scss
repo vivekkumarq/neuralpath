@@ -1,4 +1,4 @@
-/* Design tokens: type, space, radius, motion.
+/* Design tokens: type, space, radius, depth, motion.
  *
  * Colour lives in _themes.scss. Typeface and text size are driven by
  * `data-font` and `data-size` on <html>, set before first paint by the inline
@@ -13,15 +13,23 @@
   --font-body: var(--font-ui);
   --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
-  --text-xs: 0.75rem;
+  /* A major-third-ish scale. Body sits at 1rem so long reading is comfortable
+   * without the reader reaching for the size picker. */
+  --text-xs: 0.6875rem;
   --text-sm: 0.8125rem;
-  --text-base: 0.9375rem;
-  --text-md: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.375rem;
-  --text-2xl: 1.75rem;
-  --text-3xl: 2.25rem;
-  --text-4xl: clamp(2.25rem, 1.4rem + 3.4vw, 3.75rem);
+  --text-base: 1rem;
+  --text-md: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: clamp(1.75rem, 1.4rem + 1.2vw, 2.125rem);
+  --text-3xl: clamp(2.125rem, 1.6rem + 2vw, 2.75rem);
+  --text-4xl: clamp(2.5rem, 1.5rem + 4vw, 4.25rem);
+
+  /* Tracking. Display type tightens as it grows; small caps open up. */
+  --track-tight: -0.035em;
+  --track-snug: -0.02em;
+  --track-wide: 0.02em;
+  --track-caps: 0.13em;
 
   /* Space */
   --sp-1: 0.25rem;
@@ -30,21 +38,24 @@
   --sp-4: 1rem;
   --sp-5: 1.5rem;
   --sp-6: 2rem;
-  --sp-7: 3rem;
-  --sp-8: 4.5rem;
+  --sp-7: 3.25rem;
+  --sp-8: 5rem;
 
-  --radius-sm: 6px;
-  --radius: 10px;
-  --radius-lg: 16px;
+  --radius-sm: 7px;
+  --radius: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
 
   --shell-max: 1240px;
-  --prose-max: 74ch;
-  --header-h: 58px;
-  --sidebar-w: 270px;
+  --prose-max: 72ch;
+  --header-h: 60px;
+  --sidebar-w: 272px;
 
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
   --dur: 180ms;
+  --dur-slow: 420ms;
 }
 
 /* A chosen typeface drives headings too, except for the two defaults, where

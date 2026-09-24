@@ -84,7 +84,11 @@
   <ol class="journey" role="list">
     @for (module of modules; track module.slug; let i = $index) {
       <li [appReveal]="(i % 4) * 60">
-        <a class="card-link" [routerLink]="['/learn', module.slug]">
+        <a
+          class="card-link"
+          [routerLink]="['/learn', module.slug]"
+          [attr.data-stage]="module.stage < 10 ? '0' + module.stage : module.stage"
+        >
           <span class="top">
             <span class="stage">{{ module.stage < 10 ? '0' + module.stage : module.stage }}</span>
             <span class="level level-{{ module.level }}"></span>
