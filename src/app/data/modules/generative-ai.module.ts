@@ -445,5 +445,114 @@ summary = llm(f"Summarise the decisions in this transcript:\\n{result['text']}")
       ],
       related: ['transfer-learning-and-vits', 'hugging-face-ecosystem'],
     },
+    {
+      slug: 'speech-and-audio',
+      title: 'Speech and audio, from waveform to transcript',
+      module: 'generative-ai',
+      level: 'intermediate',
+      minutes: 10,
+      summary:
+        'How sound becomes numbers, what a spectrogram is, and how to build a transcription pipeline that survives real recordings.',
+      why: 'Audio is the one modality where the fundamentals still matter in practice. Sample rate, channels and background noise decide whether a transcript is usable, and none of it is visible from the API call.',
+      prerequisites: ['multimodal-and-speech'],
+      outcomes: [
+        'Explain sampling, bit depth and why 16kHz mono is the usual target',
+        'Read a spectrogram and say what a model sees in it',
+        'Build a transcription pipeline and judge its errors properly',
+      ],
+      tags: ['speech', 'audio', 'whisper', 'spectrogram'],
+      blocks: [
+        { kind: 'heading', text: 'Sound into numbers' },
+        {
+          kind: 'text',
+          body: 'A microphone turns air pressure into a voltage; an analogue-to-digital converter measures that voltage many thousands of times a second. **Sample rate** is how often it measures, **bit depth** how precisely.',
+        },
+        {
+          kind: 'table',
+          head: ['Property', 'Typical', 'Why it matters'],
+          rows: [
+            ['Sample rate', '16kHz for speech, 44.1kHz for music', 'Nyquist: you can only represent frequencies up to half the sample rate. Speech lives below 8kHz, so 16kHz is enough'],
+            ['Bit depth', '16-bit', 'Sets the noise floor. Lower quantises quiet detail away'],
+            ['Channels', 'Mono for speech', 'Speech models expect one channel; stereo is downmixed anyway'],
+            ['Format', 'WAV (raw) or FLAC', 'Heavy MP3 compression discards detail the model could have used'],
+          ],
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'Resampling is the most common silent bug',
+          body: 'A model trained at 16kHz fed 44.1kHz audio produces confident nonsense, because everything it hears is pitched and paced wrongly. Resample explicitly rather than assuming the library did it.',
+        },
+        { kind: 'heading', text: 'The spectrogram' },
+        {
+          kind: 'text',
+          body: 'A raw waveform is a long, unhelpful sequence — 30 seconds at 16kHz is 480,000 numbers, and the information is in the *frequencies*, not the individual samples. So the signal is cut into short overlapping windows (20–25ms) and each is passed through a Fourier transform, giving the energy at each frequency in that instant.',
+        },
+        {
+          kind: 'text',
+          body: 'Stack those windows side by side and you have a **spectrogram**: time along one axis, frequency along the other, loudness as intensity. A **mel** spectrogram warps the frequency axis to match human hearing, which is finer at low frequencies. This is what a speech model actually consumes — an image, effectively, which is why convolutional and transformer architectures transferred to audio so readily.',
+        },
+        {
+          kind: 'code',
+          lang: 'python',
+          caption: 'Load, resample, and look at what the model will see',
+          code: `import librosa
+import numpy as np
+
+# Resample to 16kHz mono on load — do not leave this to chance.
+audio, sr = librosa.load("standup.m4a", sr=16_000, mono=True)
+print(audio.shape, sr, f"{len(audio) / sr:.1f}s")
+# (480000,) 16000 30.0s
+
+mel = librosa.feature.melspectrogram(y=audio, sr=sr, n_mels=80,
+                                     n_fft=400,      # 25ms window
+                                     hop_length=160) # 10ms step
+log_mel = librosa.power_to_db(mel, ref=np.max)
+
+print(log_mel.shape)   # (80, 3001) — 80 frequency bands x ~3000 time steps
+# 480,000 samples became a 80x3001 picture. That is the model's input.`,
+        },
+        { kind: 'heading', text: 'The pipeline in practice' },
+        {
+          kind: 'steps',
+          items: [
+            { title: 'Normalise the input', body: 'Resample to 16kHz mono, and trim leading silence. Loudness-normalise if recordings vary.' },
+            { title: 'Segment long audio', body: 'Models have a fixed window — 30 seconds for Whisper. Split on silence rather than a fixed clock so words are not cut in half.' },
+            { title: 'Transcribe with timestamps', body: 'Keep them. They are what lets you link a claim back to the moment it was said.' },
+            { title: 'Bias the vocabulary', body: 'Pass expected product names and acronyms in the decoder prompt. This fixes the single most common class of error.' },
+            { title: 'Diarise if you need speakers', body: '"Who spoke when" is a separate model, not a Whisper feature. Run it alongside and merge on the timestamps.' },
+            { title: 'Post-process', body: 'Correct domain terms against a glossary, then hand the transcript to an LLM for whatever the actual task is.' },
+          ],
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'Judge it with word error rate, on your own audio',
+          body: 'WER counts substitutions, insertions and deletions against a reference transcript. Below ~10% is fine for summarising, below ~5% before you quote anyone. Benchmark numbers come from clean read speech — a meeting recorded on a laptop in a room with air conditioning will be far worse, and that is the number you need.',
+        },
+        {
+          kind: 'quiz',
+          quiz: {
+            id: 'aud-1',
+            prompt: 'Why do speech models take a mel spectrogram rather than the raw waveform?',
+            options: [
+              'Spectrograms are smaller files',
+              'The information is in how frequencies change over time, and a spectrogram presents that compactly — like an image',
+              'Waveforms cannot be loaded in Python',
+              'It removes all background noise',
+            ],
+            answer: 1,
+            explanation:
+              '30 seconds of 16kHz audio is 480,000 samples; the mel spectrogram is roughly 80x3000 and puts the linguistically meaningful structure — frequency against time — directly in front of the model.',
+          },
+        },
+      ],
+      resources: [
+        { label: 'librosa documentation', url: 'https://librosa.org/doc/latest/index.html', kind: 'docs' },
+        { label: 'Hugging Face Audio Course', url: 'https://huggingface.co/learn/audio-course', kind: 'course' },
+        { label: 'Whisper paper', url: 'https://arxiv.org/abs/2212.04356', kind: 'paper' },
+      ],
+      related: ['multimodal-and-speech', 'hugging-face-ecosystem'],
+    },
   ],
 };

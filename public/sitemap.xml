@@ -116,6 +116,16 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://vivekkumarq.github.io/neuralpath/learn/ai-engineering/ai-ethics-and-fairness</loc>
+    <lastmod>2026-09-24</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://vivekkumarq.github.io/neuralpath/learn/ai-engineering/ai-governance-and-regulation</loc>
+    <lastmod>2026-09-24</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://vivekkumarq.github.io/neuralpath/learn/computer-vision</loc>
     <lastmod>2026-09-24</lastmod>
     <priority>0.8</priority>
@@ -311,6 +321,11 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://vivekkumarq.github.io/neuralpath/learn/generative-ai/speech-and-audio</loc>
+    <lastmod>2026-09-24</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://vivekkumarq.github.io/neuralpath/learn/llm-engineering</loc>
     <lastmod>2026-09-24</lastmod>
     <priority>0.8</priority>
@@ -502,6 +517,11 @@
   </url>
   <url>
     <loc>https://vivekkumarq.github.io/neuralpath/learn/rag/rag-evaluation</loc>
+    <lastmod>2026-09-24</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://vivekkumarq.github.io/neuralpath/learn/rag/query-understanding</loc>
     <lastmod>2026-09-24</lastmod>
     <priority>0.7</priority>
   </url>

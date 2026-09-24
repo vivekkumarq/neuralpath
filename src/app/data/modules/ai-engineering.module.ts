@@ -454,5 +454,212 @@ gr.ChatInterface(
       ],
       related: ['serving-and-inference', 'latency-throughput-and-cost'],
     },
+    {
+      slug: 'ai-ethics-and-fairness',
+      title: 'Ethics, bias and fairness',
+      module: 'ai-engineering',
+      level: 'intermediate',
+      minutes: 11,
+      summary:
+        'Where harm actually comes from, how bias enters through the data, and the fairness definitions that cannot all hold at once.',
+      why: 'A model that is accurate on average can still be systematically worse for one group of people, and nothing in the training process will tell you. This is the part of the field where an engineering mistake becomes somebody else’s rejected loan or missed diagnosis.',
+      prerequisites: ['classification-metrics', 'validation-strategy'],
+      outcomes: [
+        'Trace how bias enters a system at each stage',
+        'Measure a model separately per group rather than only on average',
+        'Explain why the common fairness definitions are mathematically incompatible',
+      ],
+      tags: ['ethics', 'fairness', 'bias', 'responsible ai'],
+      blocks: [
+        {
+          kind: 'text',
+          body: 'Bias is not usually put there on purpose. It arrives through ordinary decisions that all looked reasonable at the time.',
+        },
+        {
+          kind: 'table',
+          head: ['Stage', 'How bias enters', 'Example'],
+          rows: [
+            ['Framing', 'The chosen target is a proxy for what you actually care about', 'Predicting healthcare *spend* as a stand-in for healthcare *need*, when less is historically spent on some groups'],
+            ['Collection', 'Some groups are under-represented in the data', 'A voice model trained mostly on one accent'],
+            ['Labelling', 'Human labellers carry their own assumptions', 'Toxicity labels that flag dialect as offensive'],
+            ['Historical', 'The data faithfully records past discrimination', 'Hiring data from a period when few women were promoted'],
+            ['Feature choice', 'A feature stands in for a protected attribute', 'Postcode acting as a proxy for ethnicity'],
+            ['Deployment', 'The model is used on a population it was not trained on', 'A model built on urban patients used in rural clinics'],
+            ['Feedback loop', 'The model shapes the data it is next trained on', 'Predictive policing sending patrols where arrests already happened'],
+          ],
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'Removing the protected attribute does not remove the bias',
+          body: 'Deleting the gender column feels like the fix and is not one. Other features — job history, hobbies, the wording of a CV — carry the same information, so the model reconstructs it. You usually have to *measure* the attribute to check whether you are being fair on it, which is the uncomfortable part.',
+        },
+        { kind: 'heading', text: 'Measure per group, not on average' },
+        {
+          kind: 'code',
+          lang: 'python',
+          caption: 'The same model, scored separately for each group',
+          code: `import pandas as pd
+
+results = pd.DataFrame({"group": groups, "y_true": y_test, "y_pred": preds})
+
+by_group = results.groupby("group").apply(
+    lambda g: pd.Series({
+        "n": len(g),
+        "selection_rate": g["y_pred"].mean(),                        # how often approved
+        "tpr": g.loc[g["y_true"] == 1, "y_pred"].mean(),             # recall in this group
+        "fpr": g.loc[g["y_true"] == 0, "y_pred"].mean(),
+    })
+)
+
+print(by_group.round(3))
+#         n  selection_rate    tpr    fpr
+# A    8200           0.412  0.881  0.104
+# B    1150           0.198  0.642  0.098   <- half the recall, on 1/7 the data
+
+# Four-fifths rule: a selection rate below 80% of the best group is a red flag.
+print((by_group["selection_rate"] / by_group["selection_rate"].max()).round(3))`,
+        },
+        {
+          kind: 'text',
+          body: 'Group size is the usual culprit: a group that is 12% of the data contributes 12% of the loss, so the optimiser will happily trade their accuracy for a fractional gain on the majority. **Aggregate metrics hide this by construction.**',
+        },
+        { kind: 'heading', text: 'The definitions conflict' },
+        {
+          kind: 'table',
+          head: ['Definition', 'Requires', 'Tension'],
+          rows: [
+            ['Demographic parity', 'Equal selection rate across groups', 'Ignores whether the base rates genuinely differ'],
+            ['Equal opportunity', 'Equal true-positive rate across groups', 'Can leave selection rates unequal'],
+            ['Equalised odds', 'Equal TPR *and* FPR', 'Very restrictive; usually costs accuracy'],
+            ['Calibration', 'A score of 0.7 means 70% in every group', 'Looks obviously desirable, and rules out the others'],
+          ],
+        },
+        {
+          kind: 'note',
+          tone: 'info',
+          title: 'This is a proved impossibility, not an open problem',
+          body: 'When base rates genuinely differ between groups, calibration and equalised odds cannot both hold except in degenerate cases. So "make it fair" is not a specification. Someone has to choose which definition applies, say why, and write it down — and that someone should not be the engineer deciding alone at 11pm.',
+        },
+        {
+          kind: 'list',
+          items: [
+            '**Document the intended use** — and the uses you are ruling out. A model card costs an afternoon.',
+            '**Keep a human in the loop** for consequential decisions: credit, hiring, medical, legal, policing.',
+            '**Give people a route to contest** an automated decision, and log enough to explain it.',
+            '**Consent and provenance** — know where training data came from and whether you were entitled to use it.',
+            '**Re-check after deployment.** Fairness measured once at launch says nothing about next quarter.',
+          ],
+        },
+        {
+          kind: 'quiz',
+          quiz: {
+            id: 'eth-1',
+            prompt: 'Your model is 94% accurate overall, but recall is 0.88 for one group and 0.64 for another. What is the first thing to check?',
+            options: [
+              'Nothing — 94% overall is strong',
+              'Group sizes and representation in the training data, then whether a proxy feature is carrying the attribute',
+              'Increase the number of epochs',
+              'Remove the group column from the data',
+            ],
+            answer: 1,
+            explanation:
+              'A smaller group contributes proportionally less to the loss, so the optimiser trades its accuracy away. Removing the column hides your ability to measure the gap without closing it.',
+          },
+        },
+      ],
+      resources: [
+        { label: 'Fairlearn documentation', url: 'https://fairlearn.org/', kind: 'tool' },
+        { label: 'Model Cards for Model Reporting', url: 'https://arxiv.org/abs/1810.03993', kind: 'paper' },
+        { label: 'Datasheets for Datasets', url: 'https://arxiv.org/abs/1803.09010', kind: 'paper' },
+        { label: 'Inherent Trade-Offs in Fair Determination of Risk Scores', url: 'https://arxiv.org/abs/1609.05807', kind: 'paper' },
+      ],
+      related: ['ai-governance-and-regulation', 'security-and-privacy'],
+    },
+    {
+      slug: 'ai-governance-and-regulation',
+      title: 'Governance and regulation',
+      module: 'ai-engineering',
+      level: 'intermediate',
+      minutes: 9,
+      summary:
+        'Risk tiers, the documentation you are expected to hold, and what the EU AI Act and GDPR actually require of an engineer.',
+      why: 'Compliance now shapes architecture. Whether a system is allowed to ship, what you must be able to show about it, and how long you keep the evidence are decisions made while building, not afterwards by a lawyer.',
+      prerequisites: ['ai-ethics-and-fairness'],
+      outcomes: [
+        'Place a system in the right risk tier and know what follows',
+        'Keep the documentation a regulator or customer will ask for',
+        'Explain the GDPR rules that bite hardest on ML',
+      ],
+      tags: ['regulation', 'governance', 'eu ai act', 'gdpr', 'compliance'],
+      blocks: [
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'Engineering guidance, not legal advice',
+          body: 'This is the shape of the obligations so you can build sensibly and ask the right questions. Jurisdictions differ, rules change, and anything consequential needs your organisation’s legal counsel.',
+        },
+        { kind: 'heading', text: 'Risk tiers' },
+        {
+          kind: 'text',
+          body: 'The EU AI Act sorts systems by what they are used for rather than by the technique used. The tier decides the obligations.',
+        },
+        {
+          kind: 'table',
+          head: ['Tier', 'Examples', 'What it means for you'],
+          rows: [
+            ['Unacceptable', 'Social scoring, manipulative systems, most real-time remote biometric identification in public', 'Prohibited'],
+            ['High risk', 'Employment, credit, education, essential services, medical devices, critical infrastructure', 'Risk management, data governance, technical documentation, logging, human oversight, accuracy and robustness testing, conformity assessment'],
+            ['Limited risk', 'Chatbots, emotion recognition, deepfakes', 'Transparency: people must be told they are dealing with AI, and synthetic media must be marked'],
+            ['Minimal risk', 'Spam filters, recommendations, most internal tooling', 'No specific obligations'],
+          ],
+        },
+        {
+          kind: 'text',
+          body: 'General-purpose model providers carry their own duties — technical documentation, a copyright policy and a training-data summary — with heavier ones above a compute threshold. If you *deploy* someone else’s model rather than train one, you are usually a deployer, and the high-risk duties around oversight, logging and monitoring still land on you.',
+        },
+        { kind: 'heading', text: 'GDPR, where it touches ML' },
+        {
+          kind: 'list',
+          items: [
+            '**Lawful basis** — you need one to process personal data at all, and "we already had the data" is not it. Data collected for one purpose cannot silently become training data for another.',
+            '**Automated decisions** (Article 22) — a decision with legal or similarly significant effect, made with no human involvement, needs a specific basis plus the right to contest it and obtain human review.',
+            '**Transparency** — meaningful information about the logic involved. Not your weights; the factors and how they are used.',
+            '**Minimisation** — collect what the task needs. A model that performs identically without date of birth should not be given it.',
+            '**Erasure** — a deletion request must reach your vector index, your traces and your backups, not just the primary database. Design for this before you need it.',
+            '**Special category data** — health, biometrics, ethnicity, beliefs, sexuality carry a higher bar. Note that inferring them counts.',
+          ],
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'What to keep, from day one',
+          body: 'Data provenance and consent basis; a model card stating intended and excluded uses; evaluation results including per-group breakdowns; the version of model, data and prompts behind any decision; and decision logs with a retention period. Assembling this retrospectively is painful; capturing it as you go is nearly free — and it is the same material that makes a system debuggable.',
+        },
+        {
+          kind: 'quiz',
+          quiz: {
+            id: 'gov-1',
+            prompt: 'You deploy a third-party LLM to screen job applications for an EU employer. Which is true?',
+            options: [
+              'The model provider carries the obligations, not you',
+              'It is high risk, and as deployer you owe human oversight, logging, monitoring and the ability to explain and contest a decision',
+              'It is minimal risk because you did not train the model',
+              'GDPR does not apply to text',
+            ],
+            answer: 1,
+            explanation:
+              'Employment screening is explicitly high risk, and the duties follow the use rather than who trained the model. Buying it in does not transfer them away from you.',
+          },
+        },
+      ],
+      resources: [
+        { label: 'EU AI Act — official text', url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/oj', kind: 'docs' },
+        { label: 'NIST AI Risk Management Framework', url: 'https://www.nist.gov/itl/ai-risk-management-framework', kind: 'docs' },
+        { label: 'GDPR full text', url: 'https://gdpr-info.eu/', kind: 'docs' },
+        { label: 'ISO/IEC 42001 (AI management systems)', url: 'https://www.iso.org/standard/81230.html', kind: 'docs' },
+      ],
+      related: ['ai-ethics-and-fairness', 'observability-and-evals'],
+    },
   ],
 };

@@ -431,5 +431,119 @@ print(recall_at_k(retrieved, gold, k=5), mrr(retrieved, gold))`,
       ],
       related: ['observability-and-evals', 'genai-evaluation'],
     },
+    {
+      slug: 'query-understanding',
+      title: 'Query rewriting, expansion and graph retrieval',
+      module: 'rag',
+      level: 'advanced',
+      minutes: 9,
+      summary:
+        'Fixing retrieval on the query side: rewriting a follow-up into a standalone question, expanding vocabulary, HyDE, and when a graph beats a vector.',
+      why: 'Most RAG work happens on the document side — chunking, embedding, reranking — while the query is passed through untouched. Real queries are short, ambiguous and full of pronouns referring to the previous turn, and no amount of index tuning fixes a question the retriever cannot understand.',
+      prerequisites: ['reranking-and-context', 'rag-evaluation'],
+      outcomes: [
+        'Rewrite a conversational follow-up into a self-contained query',
+        'Expand a query without drowning the retriever in noise',
+        'Say when a knowledge graph answers what vector search cannot',
+      ],
+      tags: ['query rewriting', 'hyde', 'graphrag', 'retrieval'],
+      blocks: [
+        {
+          kind: 'text',
+          body: 'Consider the second turn of a conversation: *"what about the free plan?"* Embedded on its own it retrieves nothing useful — it contains no subject. The document index is fine; the query is the problem.',
+        },
+        {
+          kind: 'table',
+          head: ['Technique', 'What it does', 'Costs'],
+          rows: [
+            ['Rewriting', 'Turns a follow-up into a standalone question using the conversation history', 'One extra LLM call before retrieval'],
+            ['Expansion', 'Adds synonyms and related terms the corpus may use instead', 'Dilution if over-applied'],
+            ['Decomposition', 'Splits a multi-part question into separate retrievals', 'Several searches, then a merge'],
+            ['HyDE', 'Generates a hypothetical answer and embeds *that* to search with', 'A call, and it can anchor on a wrong guess'],
+            ['Routing', 'Sends the query to the right index or tool first', 'A classifier to maintain'],
+            ['Graph retrieval', 'Follows entity relationships instead of similarity', 'Building and maintaining the graph'],
+          ],
+        },
+        {
+          kind: 'code',
+          lang: 'python',
+          caption: 'Rewriting, then expanding — both before the query is ever embedded',
+          code: `REWRITE = """Rewrite the follow-up as a standalone question.
+Keep the user's wording where you can. Return only the question.
+
+History:
+{history}
+
+Follow-up: {question}"""
+
+
+def prepare(question: str, history: list[str]) -> list[str]:
+    standalone = llm(REWRITE.format(history="\\n".join(history[-4:]),
+                                    question=question), temperature=0)
+
+    # "what about the free plan?"  ->  "Are webhooks available on the free plan?"
+    variants = [standalone]
+
+    # Expansion earns its place on corpora with a house vocabulary: the user
+    # says "cancel", the documentation says "terminate subscription".
+    if len(standalone.split()) < 8:
+        variants += llm_expand(standalone, n=2)
+
+    return variants
+
+
+# Retrieve for every variant, then fuse the rankings — the same RRF used for
+# hybrid search, so a chunk found by several variants rises.
+candidates = rrf([search(v) for v in prepare(question, history)])`,
+        },
+        { kind: 'heading', text: 'HyDE' },
+        {
+          kind: 'text',
+          body: 'Hypothetical Document Embeddings inverts the usual comparison. Rather than matching a short question against long passages — which are shaped very differently — it asks the model to *write* a plausible answer, then embeds that. A fabricated answer and a real passage look alike in embedding space, so similarity search works better. The invented facts never reach the reader; only the embedding is used.',
+        },
+        { kind: 'heading', text: 'When a graph beats a vector' },
+        {
+          kind: 'text',
+          body: 'Vector search retrieves chunks that resemble the query. It cannot answer *"which suppliers are affected by the outage at the Pune site, and who owns those contracts?"* — that requires following relationships across documents, and no single chunk contains the answer.',
+        },
+        {
+          kind: 'list',
+          items: [
+            '**GraphRAG** extracts entities and relationships into a graph, then traverses it to assemble context — optionally summarising whole communities of related nodes.',
+            '**It suits** multi-hop questions, "how does X connect to Y", and corpora where the answer is spread across many documents.',
+            '**It costs** an extraction pass over the corpus, a graph to keep current, and considerably more engineering than an index.',
+            '**Try the cheap things first.** Rewriting plus hybrid retrieval plus reranking resolves most complaints. Reach for a graph when your failures are genuinely relational, not merely hard.',
+          ],
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'Measure each addition separately',
+          body: 'Every one of these adds latency and a call, and expansion can make retrieval worse by pulling in near-miss vocabulary. Add one, re-run recall@k and MRR on your labelled set, keep it only if it earns its place. Stacking all six because a blog post recommended them is how a 300ms retrieval becomes three seconds.',
+        },
+        {
+          kind: 'quiz',
+          quiz: {
+            id: 'qu-1',
+            prompt: 'In a chat assistant, the first question works well and every follow-up retrieves badly. What is the fix?',
+            options: [
+              'A larger embedding model',
+              'Rewrite each follow-up into a standalone question using the history before embedding it',
+              'Increase top-k',
+              'Re-chunk the documents',
+            ],
+            answer: 1,
+            explanation:
+              'A follow-up like "what about the free plan?" has no subject to embed. The index is fine — the query needs the context of the conversation folded into it before retrieval.',
+          },
+        },
+      ],
+      resources: [
+        { label: 'Precise Zero-Shot Dense Retrieval without Relevance Labels (HyDE)', url: 'https://arxiv.org/abs/2212.10496', kind: 'paper' },
+        { label: 'From Local to Global: A Graph RAG Approach', url: 'https://arxiv.org/abs/2404.16130', kind: 'paper' },
+        { label: 'LangChain query transformation guide', url: 'https://python.langchain.com/docs/concepts/retrieval/', kind: 'docs' },
+      ],
+      related: ['reranking-and-context', 'vector-search-and-hybrid'],
+    },
   ],
 };
