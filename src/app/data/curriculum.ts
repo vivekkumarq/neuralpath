@@ -1,4 +1,5 @@
 import { Module, Topic } from '../core/models/content.models';
+import { orientationModule } from './modules/orientation.module';
 import { foundationsModule } from './modules/foundations.module';
 import { mathematicsModule } from './modules/mathematics.module';
 import { dataModule } from './modules/data.module';
@@ -23,6 +24,7 @@ import { mlopsModule } from './modules/mlops.module';
  * "next topic" is simply the next element of `allTopics()`.
  */
 export const MODULES: Module[] = [
+  orientationModule,
   foundationsModule,
   mathematicsModule,
   dataModule,

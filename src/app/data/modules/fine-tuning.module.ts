@@ -4,7 +4,7 @@ export const fineTuningModule: Module = {
   slug: 'fine-tuning',
   title: 'Fine-Tuning and Adaptation',
   short: 'Fine-Tuning',
-  stage: 12,
+  stage: 13,
   level: 'advanced',
   tagline: 'When to adapt weights, how LoRA works, and what fine-tuning cannot fix.',
   description:

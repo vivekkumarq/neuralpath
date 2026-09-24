@@ -4,7 +4,7 @@ export const llmEngineeringModule: Module = {
   slug: 'llm-engineering',
   title: 'LLM Engineering',
   short: 'LLM',
-  stage: 10,
+  stage: 11,
   level: 'advanced',
   tagline: 'Tokens, context, sampling parameters, embeddings and prompt infrastructure.',
   description:

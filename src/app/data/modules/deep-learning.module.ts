@@ -4,7 +4,7 @@ export const deepLearningModule: Module = {
   slug: 'deep-learning',
   title: 'Deep Learning',
   short: 'Deep Learning',
-  stage: 5,
+  stage: 6,
   level: 'intermediate',
   tagline: 'Neural networks from the perceptron up: layers, activations, backpropagation, training.',
   description:

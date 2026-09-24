@@ -4,7 +4,7 @@ export const foundationsModule: Module = {
   slug: 'foundations',
   title: 'Engineering Foundations',
   short: 'Foundations',
-  stage: 0,
+  stage: 1,
   level: 'beginner',
   tagline: 'The programming and tooling floor every AI role stands on.',
   description:
@@ -13,6 +13,190 @@ export const foundationsModule: Module = {
     'fear. Skipping this stage is the single most common reason people stall three weeks into ' +
     'machine learning.',
   topics: [
+    {
+      slug: 'programming-from-zero',
+      title: 'Your first Python, from nothing',
+      module: 'foundations',
+      level: 'beginner',
+      minutes: 12,
+      summary:
+        'Running your first line of code, then variables, types, conditions, loops and functions — assuming you have never programmed.',
+      why: 'The rest of this curriculum is written in Python. If you have never written code, everything after this stage will look like noise; with these six ideas, it will look like sentences. This is the only topic here that assumes nothing at all.',
+      outcomes: [
+        'Run Python without installing anything',
+        'Use variables, the basic types, conditions and loops',
+        'Write a function, and read an error message without panic',
+      ],
+      tags: ['python', 'beginner', 'programming'],
+      blocks: [
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'Start in the browser',
+          body: 'Open [Google Colab](https://colab.research.google.com/), choose a new notebook, type into a cell and press Shift+Enter. Nothing to install, and it has a free GPU for later. Set up a local environment once you are writing more than a few lines — that is the next topic.',
+        },
+        { kind: 'heading', text: 'Variables and types' },
+        {
+          kind: 'text',
+          body: 'A **variable** is a name for a value. A **type** is what kind of value it is. Python works the type out for you.',
+        },
+        {
+          kind: 'code',
+          lang: 'python',
+          caption: 'Type each line, run it, and read the output',
+          code: `name = "Vivek"          # str  — text, in quotes
+age = 27                 # int  — a whole number
+height = 1.75            # float — a number with a decimal point
+learning = True          # bool — True or False
+
+print(name, age, height, learning)
+# Vivek 27 1.75 True
+
+print(type(age))         # <class 'int'>
+print(age + 3)           # 30   — arithmetic
+print(name + " Kumar")   # Vivek Kumar  — "+" joins text
+print(f"{name} is {age}")  # Vivek is 27  — an f-string fills in the values`,
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'Quotes decide everything',
+          body: '`27` is a number you can do arithmetic with. `"27"` is text. `"27" + 3` is an error, and it is one of the two or three mistakes every beginner makes in their first week. Reading the error message tells you exactly this.',
+        },
+        { kind: 'heading', text: 'Collections: lists and dictionaries' },
+        {
+          kind: 'code',
+          lang: 'python',
+          caption: 'Holding more than one thing',
+          code: `# A list: an ordered sequence. Counting starts at 0.
+scores = [78, 91, 64, 88]
+print(scores[0])         # 78   — the first item
+print(len(scores))       # 4    — how many
+scores.append(95)        # add to the end
+
+# A dictionary: labelled values, looked up by name.
+student = {"name": "Asha", "score": 91, "passed": True}
+print(student["score"])  # 91
+student["grade"] = "A"   # add a new label`,
+        },
+        { kind: 'heading', text: 'Making decisions and repeating work' },
+        {
+          kind: 'code',
+          lang: 'python',
+          caption: 'Conditions and loops — note that indentation is what groups the lines',
+          code: `score = 72
+
+if score >= 80:
+    print("distinction")
+elif score >= 50:
+    print("pass")
+else:
+    print("retake")
+# pass
+
+# A loop repeats once per item.
+for score in [78, 91, 64]:
+    if score >= 80:
+        print(score, "is high")
+    else:
+        print(score, "is not")
+
+# 78 is not
+# 91 is high
+# 64 is not`,
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'Indentation is not decoration',
+          body: 'In most languages, braces group lines together. In Python, the indentation does. Four spaces in means "this line belongs to the `if` above it". Get it wrong and you get an `IndentationError` — which is Python telling you precisely what is wrong.',
+        },
+        { kind: 'heading', text: 'Functions' },
+        {
+          kind: 'text',
+          body: 'A **function** is a named piece of work you can reuse. You give it inputs, it gives back a result. Everything you will use from a library — `train_test_split`, `model.predict` — is somebody else’s function.',
+        },
+        {
+          kind: 'code',
+          lang: 'python',
+          caption: 'Writing one, then using it',
+          code: `def grade(score):
+    """Turn a number into a label."""
+    if score >= 80:
+        return "distinction"
+    if score >= 50:
+        return "pass"
+    return "retake"
+
+
+print(grade(91))     # distinction
+print(grade(51))     # pass
+
+for score in [78, 91, 64]:
+    print(score, "->", grade(score))`,
+        },
+        { kind: 'heading', text: 'Reading an error message' },
+        {
+          kind: 'code',
+          lang: 'text',
+          caption: 'Errors are instructions, not insults — read the last line first',
+          code: `Traceback (most recent call last):
+  File "grades.py", line 12, in <module>
+    print(grade("ninety"))
+  File "grades.py", line 4, in grade
+    if score >= 80:
+TypeError: '>=' not supported between instances of 'str' and 'int'`,
+        },
+        {
+          kind: 'list',
+          items: [
+            '**Last line** — what went wrong: you compared text with a number.',
+            '**The file and line** — where: line 4, inside `grade`.',
+            '**The lines above** — how you got there: line 12 called it with `"ninety"` instead of `90`.',
+            'Nearly every error you hit in your first month is a type mismatch, a typo in a name, or wrong indentation. Paste the last line into a search engine and you will find it answered.',
+          ],
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'How much is enough to move on',
+          body: 'If you can write a function that loops over a list, makes a decision and returns a result — you are ready for the next topic. You do not need classes, decorators or async yet. You will pick those up when something forces you to.',
+        },
+        {
+          kind: 'quiz',
+          quiz: {
+            id: 'zero-1',
+            prompt: 'What does `scores[0]` give you, for `scores = [78, 91, 64]`?',
+            options: ['91', '78', 'An error', 'The whole list'],
+            answer: 1,
+            explanation:
+              'Counting starts at 0 in Python, so index 0 is the first item, 78. This trips up almost everyone once; after that it becomes second nature.',
+          },
+        },
+        {
+          kind: 'quiz',
+          quiz: {
+            id: 'zero-2',
+            prompt: 'Your code fails with `TypeError: can only concatenate str (not "int") to str`. What is the likely cause?',
+            options: [
+              'A missing semicolon',
+              'You tried to join text and a number with "+"',
+              'The file is too long',
+              'Python is not installed',
+            ],
+            answer: 1,
+            explanation:
+              'Python will not silently mix text and numbers. Convert first — `"age: " + str(27)` — or use an f-string: `f"age: {27}"`.',
+          },
+        },
+      ],
+      resources: [
+        { label: 'Python official tutorial', url: 'https://docs.python.org/3/tutorial/', kind: 'docs' },
+        { label: 'Google Colab', url: 'https://colab.research.google.com/', kind: 'tool' },
+        { label: 'Automate the Boring Stuff with Python (free)', url: 'https://automatetheboringstuff.com/', kind: 'book' },
+      ],
+      related: ['python-for-ml', 'what-is-ai'],
+    },
     {
       slug: 'python-for-ml',
       title: 'Python for machine learning',
@@ -27,6 +211,7 @@ export const foundationsModule: Module = {
         'Write comprehensions and generator expressions that stay readable',
         'Read a library signature and know what it wants',
       ],
+      prerequisites: ['programming-from-zero'],
       tags: ['python', 'programming', 'basics'],
       blocks: [
         {

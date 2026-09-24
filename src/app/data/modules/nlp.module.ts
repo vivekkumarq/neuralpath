@@ -4,7 +4,7 @@ export const nlpModule: Module = {
   slug: 'nlp',
   title: 'Natural Language Processing',
   short: 'NLP',
-  stage: 7,
+  stage: 8,
   level: 'intermediate',
   tagline: 'From tokenisation and TF-IDF to embeddings and sequence models.',
   description:

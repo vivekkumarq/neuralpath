@@ -4,7 +4,7 @@ export const transformersModule: Module = {
   slug: 'transformers',
   title: 'Transformers',
   short: 'Transformers',
-  stage: 8,
+  stage: 9,
   level: 'advanced',
   tagline: 'Self-attention, multi-head attention, positional encoding and the full architecture.',
   description:

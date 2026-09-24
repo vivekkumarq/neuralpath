@@ -4,7 +4,7 @@ export const mathematicsModule: Module = {
   slug: 'mathematics',
   title: 'Mathematics for ML',
   short: 'Mathematics',
-  stage: 1,
+  stage: 2,
   level: 'beginner',
   tagline: 'Linear algebra, probability and calculus — only the parts models are built from.',
   description:

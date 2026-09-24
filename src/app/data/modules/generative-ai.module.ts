@@ -4,7 +4,7 @@ export const generativeAiModule: Module = {
   slug: 'generative-ai',
   title: 'Generative AI',
   short: 'GenAI',
-  stage: 9,
+  stage: 10,
   level: 'intermediate',
   tagline: 'Foundation models, prompting, structured output, tool use and evaluation.',
   description:

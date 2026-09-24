@@ -4,7 +4,7 @@ export const dataModule: Module = {
   slug: 'data',
   title: 'Data and Feature Engineering',
   short: 'Data',
-  stage: 2,
+  stage: 3,
   level: 'beginner',
   tagline: 'NumPy, pandas, cleaning, features and the split discipline that keeps results honest.',
   description:

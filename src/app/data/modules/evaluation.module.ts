@@ -4,7 +4,7 @@ export const evaluationModule: Module = {
   slug: 'evaluation',
   title: 'Model Evaluation',
   short: 'Evaluation',
-  stage: 4,
+  stage: 5,
   level: 'intermediate',
   tagline: 'Metrics that tell you the truth, and the split discipline behind them.',
   description:

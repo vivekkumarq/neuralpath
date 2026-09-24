@@ -4,7 +4,7 @@ export const ragModule: Module = {
   slug: 'rag',
   title: 'Retrieval-Augmented Generation',
   short: 'RAG',
-  stage: 11,
+  stage: 12,
   level: 'advanced',
   tagline: 'Chunking, embedding, vector search, reranking and evaluation of the whole pipeline.',
   description:

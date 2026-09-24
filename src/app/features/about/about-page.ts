@@ -30,7 +30,7 @@ import { Icon } from '../../shared/icon';
         <p>
           The platform answers one question in order: <em>I know little or nothing about AI/ML —
           where do I start, what comes next, why does it matter, and how do I practise it?</em>
-          Sixteen stages run from Python and tooling through mathematics, data, machine learning,
+          Seventeen stages run from what AI is, through Python and tooling, mathematics, data, machine learning,
           deep learning, computer vision, NLP, transformers, generative AI, LLM engineering, RAG,
           fine-tuning, agents, production AI engineering and MLOps.
         </p>

@@ -4,7 +4,7 @@ export const aiAgentsModule: Module = {
   slug: 'ai-agents',
   title: 'AI Agents',
   short: 'Agents',
-  stage: 13,
+  stage: 14,
   level: 'advanced',
   tagline: 'Loops, tools, memory, orchestration and the reliability problem.',
   description:

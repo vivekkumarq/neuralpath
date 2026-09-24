@@ -4,7 +4,7 @@ export const machineLearningModule: Module = {
   slug: 'machine-learning',
   title: 'Machine Learning',
   short: 'ML',
-  stage: 3,
+  stage: 4,
   level: 'intermediate',
   tagline: 'Supervised and unsupervised learning, and the concepts that generalise to everything after.',
   description:

@@ -4,7 +4,7 @@ export const computerVisionModule: Module = {
   slug: 'computer-vision',
   title: 'Computer Vision',
   short: 'Vision',
-  stage: 6,
+  stage: 7,
   level: 'intermediate',
   tagline: 'Images as tensors, convolution, CNNs, detection and vision transformers.',
   description:
