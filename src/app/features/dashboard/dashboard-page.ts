@@ -5,12 +5,13 @@ import { ProgressService } from '../../core/services/progress.service';
 import { StorageService } from '../../core/services/storage.service';
 import { CURRICULUM_STATS, MODULES, topicBySlug } from '../../data/curriculum';
 import { PATH_PROFILES } from '../../data/now';
+import { CurriculumMap } from '../../shared/curriculum-map';
 import { Icon } from '../../shared/icon';
 
 @Component({
   selector: 'app-dashboard-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, Icon],
+  imports: [RouterLink, Icon, CurriculumMap],
   template: `
     <div class="container page">
       <header class="section-head">
@@ -31,6 +32,8 @@ import { Icon } from '../../shared/icon';
           </span>
         </p>
       }
+
+      <app-curriculum-map />
 
       <section class="overview">
         <div class="card headline">

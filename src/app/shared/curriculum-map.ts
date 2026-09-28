@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ProgressService } from '../core/services/progress.service';
+import { LEVELS } from '../core/models/content.models';
 import { MODULES } from '../data/curriculum';
 
 /**
@@ -35,6 +36,13 @@ import { MODULES } from '../data/curriculum';
         </a>
       }
     </nav>
+
+    <p class="legend">
+      <span class="key">Ring fills with your progress</span>
+      @for (item of levels; track item) {
+        <span class="key level-{{ item }}"><i></i>{{ item }}</span>
+      }
+    </p>
   `,
   styles: `
     /* Explicit column counts rather than auto-fit: the rail between nodes has
@@ -49,6 +57,33 @@ import { MODULES } from '../data/curriculum';
 
     .node:nth-child(9n)::before {
       display: none;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--sp-2) var(--sp-4);
+      padding-bottom: var(--sp-4);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      letter-spacing: var(--track-wide);
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+
+    .key {
+      --tone: var(--ink-3);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .key i {
+      width: 8px;
+      height: 8px;
+      border-radius: 99px;
+      background: var(--tone);
     }
 
     .node {
@@ -217,6 +252,8 @@ import { MODULES } from '../data/curriculum';
 })
 export class CurriculumMap {
   private readonly progress = inject(ProgressService);
+
+  protected readonly levels = LEVELS;
 
   protected readonly nodes = computed(() => {
     const byModule = this.progress.byModule();
