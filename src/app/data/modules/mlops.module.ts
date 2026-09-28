@@ -4,7 +4,7 @@ export const mlopsModule: Module = {
   slug: 'mlops',
   title: 'MLOps and Career',
   short: 'MLOps',
-  stage: 16,
+  stage: 17,
   level: 'advanced',
   tagline: 'Experiment tracking, pipelines, CI/CD, drift monitoring — and which role is which.',
   description:

@@ -4,7 +4,7 @@ export const aiEngineeringModule: Module = {
   slug: 'ai-engineering',
   title: 'Production AI Engineering',
   short: 'AI Eng',
-  stage: 15,
+  stage: 16,
   level: 'expert',
   tagline: 'Serving, latency, cost, observability and security for systems with a model inside.',
   description:

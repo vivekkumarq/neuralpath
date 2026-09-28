@@ -491,5 +491,336 @@ print("held out:", round(search.score(X_test, y_test), 4))   # touched once`,
       ],
       related: ['validation-strategy', 'regularising-deep-networks'],
     },
+    {
+      slug: 'anomaly-detection',
+      title: 'Anomaly and outlier detection',
+      module: 'machine-learning',
+      level: 'intermediate',
+      minutes: 10,
+      summary:
+        'Finding the rare, the broken and the fraudulent when you have almost no examples of it — and usually no labels at all.',
+      why: 'Fraud, equipment failure and intrusion share a shape that breaks ordinary classification: the positive class is a fraction of a percent, the examples you do have are not representative of the next one, and often nobody labelled anything. A classifier that predicts "normal" every time scores 99.9% accuracy and is worthless.',
+      prerequisites: ['ml-fundamentals', 'unsupervised-learning'],
+      outcomes: [
+        'Choose between supervised, semi-supervised and unsupervised framing for a rare-event problem',
+        'Explain how isolation forest, one-class SVM and LOF each define "unusual"',
+        'Set a threshold from a contamination budget rather than a score',
+        'Say why precision at k is the metric operations teams actually care about',
+      ],
+      tags: ['anomaly detection', 'isolation forest', 'outliers', 'fraud'],
+      blocks: [
+        {
+          kind: 'text',
+          body: 'Start by deciding what you actually have. If you have a reasonable number of labelled anomalies, this is an **imbalanced classification** problem and the tools from that stage apply. If you have only normal data, it is **novelty detection**. If you have unlabelled data that probably contains some anomalies already, it is **outlier detection**. The three need different algorithms.',
+        },
+        {
+          kind: 'table',
+          head: ['Method', 'How it defines unusual', 'Where it fits'],
+          rows: [
+            ['Isolation forest', 'Points that random splits separate quickly', 'Default first try; scales well, few assumptions'],
+            ['One-class SVM', 'Points outside a learned boundary around normal data', 'Clean training data with no contamination'],
+            ['Local outlier factor', 'Points in a sparser neighbourhood than their neighbours', 'Clusters of differing density'],
+            ['Gaussian / elliptic envelope', 'Low probability under a fitted distribution', 'Roughly normal, low-dimensional data'],
+            ['Autoencoder reconstruction error', 'Points the model cannot reconstruct', 'High-dimensional data: images, signals'],
+          ],
+        },
+        { kind: 'heading', text: 'Why isolation forest is the sensible default' },
+        {
+          kind: 'text',
+          body: 'Most methods model what normal looks like and measure distance from it. Isolation forest inverts the idea: build random trees by picking a feature and a random split point, and count how many splits it takes to isolate each point. Anomalies are, by definition, easy to separate — so they sit at shallow depth. It needs no distance metric, makes no distributional assumption, and is linear in the number of samples.',
+        },
+        {
+          kind: 'code',
+          lang: 'python',
+          caption: 'Contamination is the expected anomaly rate, and it sets the threshold.',
+          code: `from sklearn.ensemble import IsolationForest
+
+model = IsolationForest(
+    n_estimators=200,
+    contamination=0.01,   # you expect ~1% anomalies
+    random_state=0,
+).fit(X_train)
+
+# -1 is an anomaly, 1 is normal.
+labels = model.predict(X_test)
+
+# The raw score is more useful: rank by it and work down the list.
+scores = -model.score_samples(X_test)`,
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'Set the threshold from capacity, not from the score',
+          body: 'A fraud team can investigate perhaps two hundred cases a day. That number, not a score cutoff, is the real threshold: rank by anomaly score and take the top two hundred. It also gives you the honest metric — **precision at k** — which answers "of the cases we actually looked at, how many were real".',
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'Scale first, and watch for drift',
+          body: 'Every distance-based method (one-class SVM, LOF) is meaningless on unscaled features, exactly as k-means is. And normal behaviour moves: a model trained on last year decides this year is entirely anomalous. Anomaly detection needs the monitoring discipline from the MLOps stage more than most models do.',
+        },
+        {
+          kind: 'quiz',
+          quiz: {
+            id: 'anom-1',
+            prompt: 'You have 5 million transactions and 300 confirmed frauds. Which framing is usually best?',
+            options: [
+              'Unsupervised outlier detection, ignoring the labels',
+              'Supervised classification with class weighting, using anomaly scores as an extra feature',
+              'Train a one-class SVM on the 300 frauds',
+              'Downsample the normal transactions to 300 and train normally',
+            ],
+            answer: 1,
+            explanation:
+              'Three hundred labels is few, but it is not zero, and labels are far more informative than any unsupervised score. Use them in a weighted classifier and feed an unsupervised anomaly score in as a feature so the model still benefits from the unlabelled structure.',
+          },
+        },
+      ],
+      resources: [
+        {
+          label: 'scikit-learn: outlier and novelty detection',
+          url: 'https://scikit-learn.org/stable/modules/outlier_detection.html',
+          kind: 'docs',
+        },
+        {
+          label: 'Isolation Forest (Liu, Ting and Zhou, 2008)',
+          url: 'https://ieeexplore.ieee.org/document/4781136',
+          kind: 'paper',
+        },
+      ],
+      related: ['unsupervised-learning', 'classification-metrics', 'monitoring-and-drift'],
+    },
+
+    {
+      slug: 'time-series-forecasting',
+      title: 'Time series forecasting',
+      module: 'machine-learning',
+      level: 'intermediate',
+      minutes: 13,
+      summary:
+        'Data where order matters: stationarity, seasonality, ARIMA and the validation discipline that stops you fooling yourself.',
+      why: 'Every cross-validation habit you have learned is wrong here. Shuffle a time series and you train on the future to predict the past; the score is excellent and the model is useless. Demand, traffic, prices and load are all time series, and they are where leakage does the most damage.',
+      prerequisites: ['ml-fundamentals', 'validation-strategy'],
+      outcomes: [
+        'Decompose a series into trend, seasonality and residual',
+        'Explain stationarity and how differencing achieves it',
+        'Read the p, d and q of an ARIMA model',
+        'Design a walk-forward split and say why k-fold is invalid here',
+        'Choose between a statistical model and gradient boosting on lag features',
+      ],
+      tags: ['time series', 'arima', 'stationarity', 'forecasting'],
+      blocks: [
+        {
+          kind: 'text',
+          body: 'A time series is an ordered sequence of observations, and the order carries information: today looks like yesterday, December looks like last December. Three components are usually worth separating — **trend** (long-run direction), **seasonality** (a repeating cycle of known period), and the **residual** left over.',
+        },
+        { kind: 'heading', text: 'Stationarity' },
+        {
+          kind: 'text',
+          body: 'A series is **stationary** if its statistical properties do not change over time: constant mean, constant variance, and an autocorrelation that depends only on the lag. Classical models require it, because a model fitted to a series whose mean is drifting is fitting the drift rather than the structure. The usual fix is **differencing** — model the change from one step to the next instead of the level.',
+        },
+        {
+          kind: 'table',
+          head: ['Symptom', 'What it means', 'Fix'],
+          rows: [
+            ['Mean rises over time', 'Trend', 'First difference'],
+            ['A cycle of fixed period', 'Seasonality', 'Seasonal difference at the period'],
+            ['Variance grows with level', 'Multiplicative behaviour', 'Log transform first'],
+          ],
+        },
+        {
+          kind: 'text',
+          body: 'The **augmented Dickey-Fuller** test gives a formal check, but plotting the series and its rolling mean answers the question most of the time. **Autocorrelation** plots are the other essential diagnostic: they show which lags actually carry signal.',
+        },
+        { kind: 'heading', text: 'ARIMA and its relatives' },
+        {
+          kind: 'text',
+          body: 'ARIMA(p, d, q) combines three ideas. **AR(p)** regresses on the previous *p* values. **I(d)** differences the series *d* times to make it stationary. **MA(q)** regresses on the previous *q* forecast errors. **SARIMA** adds a second set of terms at the seasonal period. **Exponential smoothing** is the other classical family, weighting recent observations more heavily and extending naturally to trend and seasonality (Holt-Winters).',
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'Always beat the naive forecast first',
+          body: 'The baseline for a time series is "tomorrow equals today", or for seasonal data "this December equals last December". A surprising number of published models fail to beat it. Report your error against that baseline, not in isolation — an MAE of 40 means nothing until you know the naive forecast scores 38.',
+        },
+        { kind: 'heading', text: 'Validating without leaking' },
+        {
+          kind: 'text',
+          body: 'K-fold cross-validation assumes examples are exchangeable. They are not. The only sound approach is **walk-forward** validation: train on everything up to time *t*, predict the window after it, roll forward, repeat. Every fold trains only on its own past.',
+        },
+        {
+          kind: 'code',
+          lang: 'python',
+          caption: 'TimeSeriesSplit never lets a fold see its own future.',
+          code: `from sklearn.model_selection import TimeSeriesSplit
+
+splitter = TimeSeriesSplit(n_splits=5, test_size=30)
+
+for train_idx, test_idx in splitter.split(X):
+    # train_idx is always strictly earlier than test_idx
+    model.fit(X[train_idx], y[train_idx])
+    score(model, X[test_idx], y[test_idx])`,
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'The subtle leak is in the features',
+          body: 'Splitting correctly is not enough. Scaling with statistics computed over the whole series, filling gaps by interpolating from later values, or building a rolling mean that is centred rather than trailing all leak the future into the past. Every feature must be computable from data available at prediction time.',
+        },
+        {
+          kind: 'text',
+          body: 'Machine learning models are also viable and often win on messy real data: build **lag features** (value at t−1, t−7, t−365), rolling statistics and calendar flags, then use gradient boosting. You lose the statistical interpretation and gain the ability to use external signals like promotions and weather.',
+        },
+        {
+          kind: 'quiz',
+          quiz: {
+            id: 'ts-1',
+            prompt: 'Your demand forecast scores an R² of 0.95 in five-fold cross-validation and fails in production. What is the most likely cause?',
+            options: [
+              'The model is underfitting',
+              'Random folds let it train on future data and predict the past',
+              'The learning rate was too high',
+              'There was not enough training data',
+            ],
+            answer: 1,
+            explanation:
+              'Random k-fold on a time series puts future observations in the training set for a fold whose test data is earlier. Near-neighbours in time are nearly identical, so the model effectively memorises the answer. Walk-forward validation removes the illusion.',
+          },
+        },
+        {
+          kind: 'quiz',
+          quiz: {
+            id: 'ts-2',
+            prompt: 'What does the "I" in ARIMA do?',
+            options: [
+              'Adds an intercept term',
+              'Differences the series to make it stationary',
+              'Interpolates missing values',
+              'Includes external regressors',
+            ],
+            answer: 1,
+            explanation:
+              'I stands for integrated: the series is differenced d times so that trend is removed and the result is stationary, which is the condition the AR and MA parts require.',
+          },
+        },
+      ],
+      resources: [
+        {
+          label: 'Forecasting: Principles and Practice (Hyndman and Athanasopoulos)',
+          url: 'https://otexts.com/fpp3/',
+          kind: 'book',
+        },
+        {
+          label: 'statsmodels: time series analysis',
+          url: 'https://www.statsmodels.org/stable/tsa.html',
+          kind: 'docs',
+        },
+      ],
+      related: ['validation-strategy', 'regression-metrics', 'feature-engineering'],
+    },
+
+    {
+      slug: 'recommender-systems',
+      title: 'Recommender systems',
+      module: 'machine-learning',
+      level: 'intermediate',
+      minutes: 12,
+      summary:
+        'Content-based filtering, collaborative filtering and matrix factorisation — and why the cold start never fully goes away.',
+      why: 'Recommendation is the highest-revenue application of machine learning in most consumer products, and it does not fit the standard supervised template: there is no label, only behaviour; the data is overwhelmingly missing; and the model changes the very behaviour it is trained on.',
+      prerequisites: ['ml-fundamentals', 'unsupervised-learning'],
+      outcomes: [
+        'Contrast content-based and collaborative filtering and their failure modes',
+        'Explain matrix factorisation as learning latent factors for users and items',
+        'Handle implicit feedback without treating absence as dislike',
+        'Name three strategies for the cold-start problem',
+        'Say why offline accuracy is a weak proxy for recommendation quality',
+      ],
+      tags: ['recommenders', 'collaborative filtering', 'matrix factorisation', 'cold start'],
+      blocks: [
+        {
+          kind: 'text',
+          body: 'There are two ways to decide what someone will like. **Content-based** filtering describes the items and recommends things similar to what they already chose. **Collaborative** filtering ignores the items entirely and uses the crowd: people who behaved like you also liked this.',
+        },
+        {
+          kind: 'table',
+          head: ['', 'Content-based', 'Collaborative'],
+          rows: [
+            ['Needs', 'Item features', 'Interaction history'],
+            ['New item', 'Works immediately', 'Invisible until someone interacts'],
+            ['New user', 'Needs one interaction', 'Needs several'],
+            ['Weakness', 'Recommends more of the same', 'Popularity bias'],
+            ['Strength', 'Explainable', 'Finds non-obvious connections'],
+          ],
+        },
+        { kind: 'heading', text: 'Matrix factorisation' },
+        {
+          kind: 'text',
+          body: 'Lay users along one axis and items along the other and you get a matrix that is almost entirely empty — a typical user has touched a vanishing fraction of the catalogue. Factorisation assumes this sparse matrix is approximately the product of two much smaller ones: a vector of latent factors per user, and one per item.',
+        },
+        {
+          kind: 'math',
+          expr: 'r̂(u,i) = μ + b_u + b_i + p_u · q_i',
+          note: 'A global average, a bias for how generous this user is, a bias for how well-liked this item is, and the dot product of the two latent vectors. The biases alone are a surprisingly strong baseline.',
+        },
+        {
+          kind: 'text',
+          body: 'Nobody labels the factors; they are learned. In practice they come out interpretable anyway — a dimension that separates documentary from action, or mainstream from niche. This is the same idea as the embeddings used throughout the LLM stages: a dense vector whose geometry encodes similarity.',
+        },
+        { kind: 'heading', text: 'Implicit feedback' },
+        {
+          kind: 'text',
+          body: 'Explicit ratings are rare and biased towards the extremes. Most systems run on **implicit** signals: clicks, plays, purchases, dwell time. The critical difference is that a missing entry is not a negative. A film you never watched might be one you would love, or one you never saw listed. Implicit models treat observations as positive with a **confidence** weight, and unobserved pairs as weak negatives rather than confirmed dislikes.',
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'The feedback loop is the real hazard',
+          body: 'A recommender trains on interactions it caused. Show popular items, they get more clicks, they look more popular, you show them more. Left alone the catalogue collapses to a handful of items and the model looks excellent on every offline metric while the experience narrows. Deliberate exploration and diversity constraints are not nice-to-haves.',
+        },
+        { kind: 'heading', text: 'Cold start' },
+        {
+          kind: 'list',
+          items: [
+            '**New item.** Fall back to content features until interactions accumulate — a hybrid model handles this by construction.',
+            '**New user.** Ask directly during onboarding, or recommend popular-but-diverse items and learn fast from the first few actions.',
+            '**New everything.** Use whatever context exists: device, locale, referrer, time of day. Weak signals beat none.',
+          ],
+        },
+        {
+          kind: 'text',
+          body: 'Evaluate with ranking metrics — precision at k, recall at k, NDCG — not RMSE on predicted ratings. Users see a list, not a number, and being right about the top five matters far more than being calibrated about item nine hundred. And offline metrics reward recommending what the user would have found anyway; the honest test is an online one.',
+        },
+        {
+          kind: 'quiz',
+          quiz: {
+            id: 'rec-1',
+            prompt: 'In an implicit-feedback system, what does an unobserved user-item pair mean?',
+            options: [
+              'The user disliked the item',
+              'Unknown — it may be unseen rather than rejected',
+              'The item is unavailable to that user',
+              'It should be dropped from training',
+            ],
+            answer: 1,
+            explanation:
+              'Absence conflates "did not like" with "never encountered". Treating every unobserved pair as a hard negative teaches the model that most of the catalogue is bad, which is why implicit models weight observed interactions by confidence instead.',
+          },
+        },
+      ],
+      resources: [
+        {
+          label: 'Matrix Factorization Techniques for Recommender Systems (Koren, Bell and Volinsky)',
+          url: 'https://ieeexplore.ieee.org/document/5197422',
+          kind: 'paper',
+        },
+        {
+          label: 'Collaborative Filtering for Implicit Feedback Datasets (Hu, Koren and Volinsky)',
+          url: 'https://ieeexplore.ieee.org/document/4781121',
+          kind: 'paper',
+        },
+      ],
+      related: ['unsupervised-learning', 'embeddings-explained', 'feature-engineering'],
+    },
   ],
 };

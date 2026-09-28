@@ -529,5 +529,133 @@ loader = DataLoader(TensorDataset(X, y), batch_size=64, shuffle=True)`,
       ],
       related: ['transfer-learning-and-vits', 'serving-and-inference'],
     },
+    {
+      slug: 'autoencoders-and-self-supervision',
+      title: 'Autoencoders and self-supervised learning',
+      module: 'deep-learning',
+      level: 'advanced',
+      minutes: 12,
+      summary:
+        'Learning useful representations with no labels at all — compression, denoising, contrastive objectives, and why this is how every modern foundation model is pretrained.',
+      why: 'Labels are the expensive part of machine learning; raw data is nearly free. Self-supervision is the trick that turns unlabelled data into a supervised problem by hiding part of the input and asking the model to recover it — and it is the reason models can be pretrained on the open internet at all.',
+      prerequisites: ['neural-network-basics', 'backpropagation'],
+      outcomes: [
+        'Explain an autoencoder as a learned, non-linear generalisation of PCA',
+        'Say what the bottleneck is for and what happens without one',
+        'Distinguish denoising, variational and masked objectives',
+        'Describe a contrastive objective and why negatives matter',
+        'Connect all of this to how LLMs and vision models are actually pretrained',
+      ],
+      tags: ['autoencoder', 'self-supervised', 'contrastive learning', 'representation learning'],
+      blocks: [
+        {
+          kind: 'text',
+          body: 'An **autoencoder** is a network trained to output its own input. An encoder compresses the input into a small code, a decoder expands it back, and the loss is reconstruction error. The output is worthless — the point is the code in the middle, which has to retain whatever matters and discard the rest.',
+        },
+        {
+          kind: 'note',
+          tone: 'info',
+          title: 'It is PCA with the linearity removed',
+          body: 'An autoencoder with one linear layer and squared-error loss spans the same subspace as PCA. Add non-linear activations and depth and it can follow a curved manifold that no linear projection can. That is the whole conceptual step: same objective, richer family of functions.',
+        },
+        {
+          kind: 'text',
+          body: 'The **bottleneck** is what forces learning. Give the code as many dimensions as the input and the network can learn the identity function and reconstruct perfectly while having understood nothing. Constraint is the teacher: too few dimensions to copy, so it must compress.',
+        },
+        { kind: 'heading', text: 'Useful variants' },
+        {
+          kind: 'table',
+          head: ['Variant', 'What changes', 'What you get'],
+          rows: [
+            ['Denoising', 'Corrupt the input, reconstruct the clean original', 'Robust features; cannot cheat by copying'],
+            ['Sparse', 'Penalise active units in the code', 'Parts-based, more interpretable features'],
+            ['Variational (VAE)', 'Encode a distribution, sample from it', 'A smooth latent space you can generate from'],
+            ['Masked', 'Hide patches or tokens, predict them', 'The objective behind BERT and modern vision models'],
+          ],
+        },
+        {
+          kind: 'text',
+          body: 'A plain autoencoder learns to reconstruct; a **VAE** learns a latent space you can navigate. By encoding a distribution rather than a point and pushing it towards a standard normal, nearby points decode to plausible outputs — so you can sample new data rather than only compress existing data.',
+        },
+        { kind: 'heading', text: 'Contrastive learning' },
+        {
+          kind: 'text',
+          body: 'Reconstruction wastes capacity on details nobody cares about — exact pixel values, background texture. **Contrastive** objectives skip it. Take an image, make two augmented views, and train so those two land close together in embedding space while other images land far apart. The model never reconstructs anything; it only learns what counts as the same thing.',
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'The negatives are the hard part',
+          body: 'With only positive pairs, a model that maps every input to the same constant vector wins — the embeddings collapse. Negatives are what prevent it, which is why contrastive methods historically needed very large batches. Later methods (BYOL, DINO) avoid collapse architecturally instead, with a momentum-updated target network.',
+        },
+        {
+          kind: 'text',
+          body: 'CLIP applies the same idea across two modalities: pull an image and its caption together, push mismatched pairs apart. That single objective is what lets you search images with text.',
+        },
+        { kind: 'heading', text: 'Why this underpins everything later' },
+        {
+          kind: 'list',
+          items: [
+            '**Language models** are trained by masking or by next-token prediction — self-supervision over raw text, no annotation anywhere.',
+            '**Vision transformers** are pretrained by masking patches, exactly the autoencoder objective at scale.',
+            '**Embedding models** used for RAG are trained contrastively, on pairs that should be near each other.',
+          ],
+        },
+        {
+          kind: 'text',
+          body: 'So the "foundation model" idea is not a new kind of network. It is this: pretrain with self-supervision on an enormous unlabelled corpus, then adapt with a small labelled set. The stages on transformers, LLMs and fine-tuning are all downstream of the objective described here.',
+        },
+        {
+          kind: 'quiz',
+          quiz: {
+            id: 'ae-1',
+            prompt: 'Your autoencoder reconstructs its input almost perfectly, but the codes are useless for any downstream task. What is wrong?',
+            options: [
+              'The learning rate is too low',
+              'The bottleneck is too wide, so it learned to copy rather than compress',
+              'It needs more training epochs',
+              'The reconstruction loss is the wrong choice',
+            ],
+            answer: 1,
+            explanation:
+              'Perfect reconstruction with unusable features is the signature of a code large enough to pass the input through. Without a constraint that makes copying impossible, the identity function is the easiest solution and nothing is learned.',
+          },
+        },
+        {
+          kind: 'quiz',
+          quiz: {
+            id: 'ssl-1',
+            prompt: 'Why do contrastive methods need negative examples?',
+            options: [
+              'To balance the classes in the batch',
+              'To stop every input collapsing to the same embedding',
+              'To provide labels for the downstream task',
+              'To speed up convergence',
+            ],
+            answer: 1,
+            explanation:
+              'Pulling positive pairs together is trivially satisfied by mapping everything to one point. Negatives impose the opposing force that keeps the space spread out, so the embedding has to distinguish things rather than collapse.',
+          },
+        },
+      ],
+      resources: [
+        {
+          label: 'Auto-Encoding Variational Bayes (Kingma and Welling, 2013)',
+          url: 'https://arxiv.org/abs/1312.6114',
+          kind: 'paper',
+        },
+        {
+          label: 'A Simple Framework for Contrastive Learning of Visual Representations (SimCLR)',
+          url: 'https://arxiv.org/abs/2002.05709',
+          kind: 'paper',
+        },
+        {
+          label: 'Masked Autoencoders Are Scalable Vision Learners',
+          url: 'https://arxiv.org/abs/2111.06377',
+          kind: 'paper',
+        },
+      ],
+      related: ['unsupervised-learning', 'word-embeddings', 'transfer-learning-and-vits', 'embeddings-explained'],
+    },
   ],
 };

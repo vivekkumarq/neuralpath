@@ -1,9 +1,10 @@
 import { GlossaryTerm } from '../core/models/content.models';
 import { coreTerms } from './glossary/core.terms';
 import { llmTerms } from './glossary/llm.terms';
+import { appliedTerms } from './glossary/applied.terms';
 
 /** Alphabetical, so the page needs no sorting pass. */
-export const GLOSSARY: GlossaryTerm[] = [...coreTerms, ...llmTerms].sort((a, b) =>
+export const GLOSSARY: GlossaryTerm[] = [...coreTerms, ...llmTerms, ...appliedTerms].sort((a, b) =>
   a.term.localeCompare(b.term),
 );
 

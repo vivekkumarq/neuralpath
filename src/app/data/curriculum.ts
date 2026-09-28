@@ -13,6 +13,7 @@ import { generativeAiModule } from './modules/generative-ai.module';
 import { llmEngineeringModule } from './modules/llm-engineering.module';
 import { ragModule } from './modules/rag.module';
 import { fineTuningModule } from './modules/fine-tuning.module';
+import { reinforcementLearningModule } from './modules/reinforcement-learning.module';
 import { aiAgentsModule } from './modules/ai-agents.module';
 import { aiEngineeringModule } from './modules/ai-engineering.module';
 import { mlopsModule } from './modules/mlops.module';
@@ -38,6 +39,7 @@ export const MODULES: Module[] = [
   llmEngineeringModule,
   ragModule,
   fineTuningModule,
+  reinforcementLearningModule,
   aiAgentsModule,
   aiEngineeringModule,
   mlopsModule,

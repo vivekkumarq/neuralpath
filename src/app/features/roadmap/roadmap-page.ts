@@ -4,12 +4,13 @@ import { Level } from '../../core/models/content.models';
 import { ProgressService } from '../../core/services/progress.service';
 import { CURRICULUM_STATS, MODULES } from '../../data/curriculum';
 import { PATH_PROFILES } from '../../data/now';
+import { CurriculumMap } from '../../shared/curriculum-map';
 import { Icon } from '../../shared/icon';
 
 @Component({
   selector: 'app-roadmap-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, Icon],
+  imports: [RouterLink, Icon, CurriculumMap],
   template: `
     <div class="container page">
       <header class="section-head">
@@ -22,6 +23,8 @@ import { Icon } from '../../shared/icon';
           parallelised.
         </p>
       </header>
+
+      <app-curriculum-map />
 
       <div class="controls">
         <div class="tag-list">
@@ -101,7 +104,7 @@ import { Icon } from '../../shared/icon';
                       @if (progress.isDone(topic.slug)) {
                         <app-icon name="check" [size]="13" />
                       }
-                      {{ topic.title }}
+                      <span class="t">{{ topic.title }}</span>
                       <span class="level level-{{ topic.level }}"></span>
                     </a>
                   </li>
@@ -148,7 +151,10 @@ import { Icon } from '../../shared/icon';
       gap: var(--sp-4);
     }
 
-    .track li {
+    /* Direct children only: this row layout is for the stages. As a descendant
+       selector it also caught the topic pills nested inside each card and gave
+       them the 24px marker column, collapsing them to a sliver. */
+    .track > li {
       margin: 0;
       display: grid;
       grid-template-columns: 24px minmax(0, 1fr);
@@ -184,7 +190,7 @@ import { Icon } from '../../shared/icon';
       margin-top: 6px;
     }
 
-    .track li:last-child .marker::after {
+    .track > li:last-child .marker::after {
       display: none;
     }
 
@@ -226,14 +232,21 @@ import { Icon } from '../../shared/icon';
       gap: var(--sp-2);
     }
 
+    /* flex: 0 0 auto pins each pill to its content width. Without it the row
+       shrinks every item, and because the label wraps, they collapse to a
+       one-character column. */
     .topics li {
       margin: 0;
+      flex: 0 0 auto;
+      max-width: 100%;
     }
 
     .topics a {
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
+      max-width: 100%;
+      min-height: 26px;
       padding: 0.28rem 0.6rem;
       border: 1px solid var(--border);
       border-radius: 99px;
@@ -241,6 +254,25 @@ import { Icon } from '../../shared/icon';
       font-size: var(--text-xs);
       color: var(--ink-2);
       text-decoration: none;
+      white-space: nowrap;
+      transition:
+        border-color var(--dur) var(--ease),
+        color var(--dur) var(--ease);
+    }
+
+    .topics a:hover {
+      border-color: var(--accent-line);
+      color: var(--ink);
+    }
+
+    /* A bare text node is an anonymous flex item, and an anonymous flex item
+       cannot take min-width — so the title collapsed to a one-character
+       column. The span is what gives it something to size. */
+    .topics a .t {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .topics a:hover {
@@ -260,7 +292,7 @@ import { Icon } from '../../shared/icon';
     }
 
     @media (max-width: 640px) {
-      .track li {
+      .track > li {
         grid-template-columns: minmax(0, 1fr);
       }
 
