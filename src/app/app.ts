@@ -6,6 +6,7 @@ import { AppearancePanel } from './layout/appearance-panel';
 import { BackToTop, ReadingProgress } from './layout/chrome';
 import { CommandPalette } from './layout/command-palette';
 import { Footer } from './layout/footer';
+import { Shortcuts, Toasts } from './layout/overlays';
 import { Sidebar } from './layout/sidebar';
 import { Topbar } from './layout/topbar';
 
@@ -21,6 +22,8 @@ import { Topbar } from './layout/topbar';
     Footer,
     ReadingProgress,
     BackToTop,
+    Toasts,
+    Shortcuts,
   ],
   template: `
     <a class="skip-link" href="#main" (click)="focusMain($event)">Skip to content</a>
@@ -29,6 +32,7 @@ import { Topbar } from './layout/topbar';
     <app-reading-progress />
     <app-appearance-panel />
     <app-command-palette />
+    <app-shortcuts />
 
     <div class="app-shell" [attr.data-sidebar]="ui.sidebarOpen() ? 'shown' : 'hidden'">
       <app-sidebar class="sidebar" [class.open]="ui.sidebarOpen()" />
@@ -46,6 +50,7 @@ import { Topbar } from './layout/topbar';
     </div>
 
     <app-back-to-top />
+    <app-toasts />
   `,
   styles: `
     main {

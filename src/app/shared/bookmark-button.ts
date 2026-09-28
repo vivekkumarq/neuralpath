@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { BookmarkKind, BookmarkService } from '../core/services/bookmark.service';
+import { ToastService } from '../core/services/toast.service';
 import { Icon } from './icon';
 
 /** Save or unsave any record. State lives in `BookmarkService`. */
@@ -25,6 +26,14 @@ import { Icon } from './icon';
     :host {
       display: inline-flex;
     }
+
+    button app-icon {
+      transition: transform var(--dur) var(--ease-spring);
+    }
+
+    button[aria-pressed='true'] app-icon {
+      transform: scale(1.15);
+    }
   `,
 })
 export class BookmarkButton {
@@ -35,6 +44,7 @@ export class BookmarkButton {
   readonly label = input(true);
 
   private readonly bookmarks = inject(BookmarkService);
+  private readonly toasts = inject(ToastService);
 
   protected readonly saved = computed(() => this.bookmarks.has(this.kind(), this.id()));
 
@@ -45,5 +55,6 @@ export class BookmarkButton {
       title: this.title(),
       href: this.href(),
     });
+    this.toasts.show(this.saved() ? 'Saved to bookmarks' : 'Removed from bookmarks', 'bookmark');
   }
 }

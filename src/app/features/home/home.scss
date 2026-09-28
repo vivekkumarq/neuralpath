@@ -93,6 +93,19 @@ h1 {
   margin-top: var(--sp-6);
 }
 
+/* Three buttons on a phone wrap to a ragged second row of different widths.
+   Stacking them full width is the only arrangement that stays tidy. */
+@media (max-width: 560px) {
+  .cta {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .cta .btn {
+    width: 100%;
+  }
+}
+
 .resume {
   margin-top: var(--sp-6);
   max-width: 520px;
@@ -119,6 +132,20 @@ h1 {
 .stats > div:first-child {
   padding-left: 0;
   border-left: none;
+}
+
+/* Once the row wraps, the leading rule lands mid-page on every row after the
+   first and the column just looks broken. Spacing carries it instead. */
+@media (max-width: 720px) {
+  .stats > div {
+    padding-left: 0;
+    border-left: none;
+  }
+
+  .stats {
+    gap: var(--sp-5) var(--sp-4);
+    margin-top: var(--sp-6);
+  }
 }
 
 .stats dt {
@@ -189,6 +216,14 @@ h1 {
 
 .journey a:hover::before {
   opacity: 0.1;
+}
+
+/* On a narrow card the numeral is bigger than the space it has and reads as a
+   rendering fault rather than a mark. */
+@media (max-width: 560px) {
+  .journey a::before {
+    display: none;
+  }
 }
 
 /* overflow:hidden clips the shared card hairline, so pull it back inside. */

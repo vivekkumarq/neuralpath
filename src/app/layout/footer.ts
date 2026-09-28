@@ -100,10 +100,12 @@ import { Logo } from '../shared/logo';
     .social a {
       display: inline-flex;
       align-items: center;
+      min-height: 28px;
       gap: 0.4rem;
       font-size: var(--text-sm);
       color: var(--ink-2);
       text-decoration: none;
+      transition: color var(--dur) var(--ease);
     }
 
     .social a:hover {
@@ -113,13 +115,21 @@ import { Logo } from '../shared/logo';
     nav {
       display: flex;
       flex-direction: column;
-      gap: 0.45rem;
+      gap: 0.1rem;
     }
 
+    /* These are standalone navigation links, not links inside a sentence, so
+       they owe the 24px minimum target size rather than claiming the inline
+       exemption. The padding is what gets them there. */
     nav a {
+      display: flex;
+      align-items: center;
+      min-height: 28px;
+      padding-block: 0.15rem;
       font-size: var(--text-sm);
       color: var(--ink-2);
       text-decoration: none;
+      transition: color var(--dur) var(--ease);
     }
 
     nav a:hover {

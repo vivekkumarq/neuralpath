@@ -368,10 +368,22 @@ export class Topbar {
       return;
     }
 
-    if (event.key === '/' && !typing) {
+    if (typing || event.altKey || event.ctrlKey || event.metaKey) return;
+
+    if (event.key === '/') {
       event.preventDefault();
       this.search.preload();
       this.box()?.nativeElement.focus();
+      return;
+    }
+
+    // Single-letter shortcuts, listed in the `?` overlay.
+    if (event.key.toLowerCase() === 'b') {
+      event.preventDefault();
+      this.ui.toggleSidebar();
+    } else if (event.key.toLowerCase() === 't') {
+      event.preventDefault();
+      this.appearance.toggleDark();
     }
   }
 

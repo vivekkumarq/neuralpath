@@ -654,6 +654,19 @@ input[type='range'] {
   margin-bottom: var(--sp-4);
 }
 
+/* Standalone navigation, so each crumb clears the minimum target size. */
+.breadcrumb a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  text-decoration: none;
+  transition: color var(--dur) var(--ease);
+}
+
+.breadcrumb a:hover {
+  color: var(--accent);
+}
+
 .breadcrumb a {
   text-decoration: none;
   color: var(--ink-3);

@@ -1,17 +1,19 @@
 import { Injectable, signal } from '@angular/core';
 
-/** Shared chrome state: the sidebar, the command palette and the appearance panel. */
+/** Shared chrome state: the sidebar, the command palette, appearance and help. */
 @Injectable({ providedIn: 'root' })
 export class UiService {
   private readonly sidebar = signal(true);
   private readonly palette = signal(false);
   private readonly appearance = signal(false);
+  private readonly shortcuts = signal(false);
   private readonly wide = signal(true);
   private readonly stages = signal(new Set<string>());
 
   readonly sidebarOpen = this.sidebar.asReadonly();
   readonly paletteOpen = this.palette.asReadonly();
   readonly appearanceOpen = this.appearance.asReadonly();
+  readonly shortcutsOpen = this.shortcuts.asReadonly();
   /** True once there is room for the sidebar beside the content. */
   readonly isWide = this.wide.asReadonly();
   /** Stages the reader has expanded by hand, on top of the current one. */
@@ -54,6 +56,7 @@ export class UiService {
 
   openPalette(): void {
     this.closeAppearance();
+    this.closeShortcuts();
     this.palette.set(true);
     this.lockScroll(true);
   }
@@ -75,6 +78,22 @@ export class UiService {
 
   closeAppearance(): void {
     this.appearance.set(false);
+  }
+
+  toggleShortcuts(): void {
+    if (this.shortcuts()) this.closeShortcuts();
+    else {
+      this.closePalette();
+      this.closeAppearance();
+      this.shortcuts.set(true);
+      this.lockScroll(true);
+    }
+  }
+
+  closeShortcuts(): void {
+    if (!this.shortcuts()) return;
+    this.shortcuts.set(false);
+    this.lockScroll(false);
   }
 
   private lockScroll(locked: boolean): void {

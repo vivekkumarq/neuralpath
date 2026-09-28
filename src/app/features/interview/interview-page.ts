@@ -270,15 +270,24 @@ import { InlineMarkdown } from '../../shared/markdown.pipe';
       border-color: var(--accent-line);
     }
 
+    /* This is how an answer is opened, so it owes a full-size target rather
+       than the height of one line of text. */
     .question {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       gap: var(--sp-4);
       width: 100%;
+      min-height: 32px;
+      padding-block: 0.3rem;
       text-align: left;
-      margin-top: var(--sp-3);
+      margin-top: var(--sp-2);
       color: var(--ink-3);
+      transition: color var(--dur) var(--ease);
+    }
+
+    .question:hover {
+      color: var(--accent);
     }
 
     .question h2 {

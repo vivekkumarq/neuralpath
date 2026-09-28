@@ -23,7 +23,16 @@ import { Visual } from './visuals/visual';
           <p class="body" [innerHTML]="block.body | inline"></p>
         }
         @case ('heading') {
-          <h3 [id]="anchor(block.text)">{{ block.text }}</h3>
+          <h3 [id]="anchor(block.text)">
+            {{ block.text }}
+            <a
+              class="anchor"
+              [href]="link(block.text)"
+              (click)="jump($event, anchor(block.text))"
+              aria-label="Link to this section"
+              >#</a
+            >
+          </h3>
         }
         @case ('list') {
           @if (block.ordered) {
@@ -116,6 +125,28 @@ import { Visual } from './visuals/visual';
       padding-top: var(--sp-4);
       scroll-margin-top: calc(var(--header-h) + 1.5rem);
       border-top: 1px solid var(--border);
+    }
+
+    /* The anchor is only offered once the heading is hovered or focused, so it
+       never competes with the heading itself. */
+    .anchor {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      min-height: 24px;
+      margin-left: 0.25rem;
+      vertical-align: middle;
+      color: var(--accent);
+      font-weight: 400;
+      text-decoration: none;
+      opacity: 0;
+      transition: opacity var(--dur) var(--ease);
+    }
+
+    h3:hover .anchor,
+    .anchor:focus-visible {
+      opacity: 1;
     }
 
     h3::before {
@@ -234,6 +265,23 @@ import { Visual } from './visuals/visual';
 })
 export class ContentBlocks {
   readonly blocks = input.required<Block[]>();
+
+  /**
+   * A bare `#id` would resolve against `<base href>` and navigate to the
+   * landing page, so the link carries the full path and the click scrolls.
+   */
+  protected link(text: string): string {
+    if (typeof location === 'undefined') return '#' + this.anchor(text);
+    return location.pathname + location.search + '#' + this.anchor(text);
+  }
+
+  protected jump(event: Event, id: string): void {
+    const target = document.getElementById(id);
+    if (!target) return;
+    event.preventDefault();
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    history.replaceState(null, '', location.pathname + location.search + '#' + id);
+  }
 
   /** Stable ids so the table of contents can link to a heading. */
   protected anchor(text: string): string {

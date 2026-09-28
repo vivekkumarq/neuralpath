@@ -1,7 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  HostListener,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { ProgressService } from '../../core/services/progress.service';
 import { SeoService } from '../../core/services/seo.service';
+import { ToastService } from '../../core/services/toast.service';
 import { AppearanceService } from '../../core/services/appearance.service';
 import { moduleBySlug, neighbours, topicBySlug } from '../../data/curriculum';
 import { BookmarkButton } from '../../shared/bookmark-button';
@@ -39,7 +49,7 @@ import { Icon } from '../../shared/icon';
                 type="button"
                 class="btn btn-sm"
                 [attr.aria-pressed]="done()"
-                (click)="progress.toggle(data.slug)"
+                (click)="toggleDone()"
               >
                 <app-icon [name]="done() ? 'check' : 'plus'" [size]="14" />
                 {{ done() ? 'Completed' : 'Mark complete' }}
@@ -149,7 +159,14 @@ import { Icon } from '../../shared/icon';
               <p class="eyebrow">On this page</p>
               <ul role="list">
                 @for (heading of headings(); track heading.id) {
-                  <li><a [href]="'#' + heading.id">{{ heading.text }}</a></li>
+                  <li>
+                    <a
+                      [href]="tocLink(heading.id)"
+                      [class.on]="activeHeading() === heading.id"
+                      (click)="jump($event, heading.id)"
+                      >{{ heading.text }}</a
+                    >
+                  </li>
                 }
               </ul>
             }
@@ -342,8 +359,15 @@ import { Icon } from '../../shared/icon';
     }
 
     .toc a:hover {
+      color: var(--ink);
+      border-left-color: var(--border-strong);
+    }
+
+    /* The section currently under the header, tracked by the observer below. */
+    .toc a.on {
       color: var(--accent);
       border-left-color: var(--accent);
+      font-weight: 600;
     }
 
     .aside-progress {
@@ -372,6 +396,11 @@ export class TopicPage {
   protected readonly progress = inject(ProgressService);
   protected readonly appearance = inject(AppearanceService);
   private readonly seo = inject(SeoService);
+  private readonly toasts = inject(ToastService);
+  private readonly router = inject(Router);
+
+  /** The heading currently under the header, for the table of contents. */
+  protected readonly activeHeading = signal('');
 
   protected readonly topic = computed(() => topicBySlug(this.slug()));
   protected readonly moduleTitle = computed(() => moduleBySlug(this.module())?.title ?? 'Learn');
@@ -418,5 +447,79 @@ export class TopicPage {
       this.seo.update(data.title, data.summary, `/learn/${data.module}/${data.slug}`);
       this.progress.markVisited(data.slug, data.title);
     });
+
+    // Scroll-spy. The margins put the trigger line just under the header and
+    // ignore the bottom of the viewport, so the active entry is the section
+    // actually being read rather than whichever one is merely visible.
+    effect((onCleanup) => {
+      const ids = this.headings().map((heading) => heading.id);
+      this.activeHeading.set(ids[0] ?? '');
+      if (ids.length === 0 || typeof IntersectionObserver === 'undefined') return;
+
+      let observer: IntersectionObserver | undefined;
+      const frame = requestAnimationFrame(() => {
+        observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) this.activeHeading.set(entry.target.id);
+            }
+          },
+          { rootMargin: '-96px 0px -72% 0px' },
+        );
+        for (const id of ids) {
+          const node = document.getElementById(id);
+          if (node) observer.observe(node);
+        }
+      });
+
+      onCleanup(() => {
+        cancelAnimationFrame(frame);
+        observer?.disconnect();
+      });
+    });
+  }
+
+  protected toggleDone(): void {
+    this.progress.toggle(this.slug());
+    this.toasts.show(
+      this.done()
+        ? `Marked complete — ${this.progress.completedCount()} topics done`
+        : 'Marked as not complete',
+      'check',
+    );
+  }
+
+  /**
+   * A bare `#id` resolves against `<base href>` and would navigate to the
+   * landing page, so the link carries the full path and the click scrolls.
+   */
+  protected tocLink(id: string): string {
+    if (typeof location === 'undefined') return `#${id}`;
+    return `${location.pathname}${location.search}#${id}`;
+  }
+
+  protected jump(event: Event, id: string): void {
+    const target = document.getElementById(id);
+    if (!target) return;
+    event.preventDefault();
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    this.activeHeading.set(id);
+    history.replaceState(null, '', this.tocLink(id));
+  }
+
+  /** J and K walk the curriculum without reaching for the sidebar. */
+  @HostListener('document:keydown', ['$event'])
+  protected onKey(event: KeyboardEvent): void {
+    const typing =
+      event.target instanceof HTMLElement &&
+      ['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName);
+    if (typing || event.ctrlKey || event.metaKey || event.altKey) return;
+
+    const key = event.key.toLowerCase();
+    const destination = key === 'j' ? this.next() : key === 'k' ? this.previous() : undefined;
+    if (!destination) return;
+
+    event.preventDefault();
+    void this.router.navigate(['/learn', destination.module, destination.slug]);
   }
 }
