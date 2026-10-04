@@ -90,7 +90,7 @@ print(h.shape, sum(p.numel() for p in conv1.parameters()), "params in conv1")
       title: 'CNN architectures and feature hierarchies',
       module: 'computer-vision',
       level: 'intermediate',
-      minutes: 8,
+      minutes: 11,
       summary: 'How depth builds edges into textures into objects, and what the landmark architectures contributed.',
       why: 'The feature hierarchy is the reason pretrained vision models transfer so well: the early layers learn things every image task needs.',
       prerequisites: ['images-and-convolution'],
@@ -101,6 +101,42 @@ print(h.shape, sum(p.numel() for p in conv1.parameters()), "params in conv1")
       ],
       tags: ['cnn', 'resnet', 'architecture'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'A convolution layer finds local patterns. Stack enough of them and the patterns compose: the first layer responds to edges, the next to corners and textures made of those edges, the next to object parts, and the last to whole objects. Nobody designs that hierarchy — it falls out of training, and it is the reason convolutional networks displaced hand-engineered vision features almost overnight.',
+        },
+        {
+          kind: 'text',
+          body: 'The architectures below are the landmarks in that story. Each one exists because the previous one hit a specific wall, so the sequence is worth reading as an argument rather than a list of names.',
+        },
+        {
+          kind: 'heading',
+          text: 'What each one solved',
+        },
+        {
+          kind: 'text',
+          body: '**AlexNet** proved the idea at scale in 2012 — it was not conceptually new, but GPUs and ImageNet made it trainable, and it won by a margin that ended the debate. **VGG** showed that depth itself was the lever and that a stack of small 3x3 filters beats a few large ones, because two 3x3 layers see the same region as one 5x5 while using fewer parameters and adding a non-linearity in between.',
+        },
+        {
+          kind: 'text',
+          body: '**ResNet** solved the problem that stopped VGG getting deeper. Beyond roughly twenty layers, accuracy got *worse* — and not from overfitting, since training error rose too. The gradient had too far to travel. A residual block adds a shortcut that carries the input straight past the layers, so a block only has to learn the *difference* it contributes. If it has nothing useful to add it can learn zero and pass the signal through untouched, which makes a 150-layer network trainable.',
+        },
+        {
+          kind: 'math',
+          expr: 'y = F(x) + x',
+          note: 'The whole residual idea. The shortcut gives the gradient a path with no weights on it, so it reaches early layers undiminished.',
+        },
+        {
+          kind: 'text',
+          body: '**Inception** attacked cost rather than depth: run several filter sizes in parallel and let the network choose, with 1x1 convolutions first to shrink the channel count. **EfficientNet** later showed that depth, width and input resolution should be scaled together in a fixed ratio rather than one at a time.',
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'What this means in practice',
+          body: 'You will almost never design one of these. You will pick a pretrained backbone and fine-tune it. ResNet-50 remains the sensible default for a first attempt: well understood, widely available pretrained, and fast enough to iterate on. Reach for something larger only once you have evidence that the backbone is the limitation.',
+        },
         {
           kind: 'list',
           items: [

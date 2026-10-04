@@ -17,7 +17,7 @@ export const aiEngineeringModule: Module = {
       title: 'Serving models and exposing them as APIs',
       module: 'ai-engineering',
       level: 'advanced',
-      minutes: 9,
+      minutes: 11,
       summary: 'Hosted APIs versus self-hosted inference, and the shape of a model endpoint.',
       why: 'A model that only runs in a notebook has no users. Serving is the step where accuracy becomes a product, and where an entirely different set of constraints applies.',
       prerequisites: ['apis-json-and-http', 'pytorch-and-frameworks'],
@@ -28,6 +28,42 @@ export const aiEngineeringModule: Module = {
       ],
       tags: ['serving', 'inference', 'api', 'deployment'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'A trained model is a file. Serving is everything between that file and a response your application can use, and it is where most of the engineering difficulty in AI actually lives — training happens once, serving happens on every request forever.',
+        },
+        {
+          kind: 'text',
+          body: 'The first decision is the shape of the workload. **Online** serving answers one request at a time under a latency budget, and the enemy is tail latency. **Batch** serving scores a large set on a schedule, and the enemy is throughput and cost. **Streaming** sits between them. The same model can be served all three ways, and the architecture differs completely.',
+        },
+        {
+          kind: 'heading',
+          text: 'Why batching is the main lever',
+        },
+        {
+          kind: 'text',
+          body: 'A GPU processing one request is almost entirely idle: the work is memory-bound, not compute-bound, so the weights are read for a single sequence. Batch several requests and those same weight reads serve all of them, so throughput rises enormously for a small latency cost. **Continuous batching** goes further by letting a new request join a batch already in flight rather than waiting for the previous one to finish, which is the difference between a serving stack that is economical and one that is not.',
+        },
+        {
+          kind: 'heading',
+          text: 'The pieces that make it work',
+        },
+        {
+          kind: 'list',
+          items: [
+            '**A KV cache.** Generation recomputes attention over every previous token unless the keys and values are cached. Without it, cost grows quadratically; with it, it is the cache, not the weights, that bounds how many requests fit in memory.',
+            '**Quantisation.** Serving at 8-bit or 4-bit cuts memory and raises throughput for a small, measurable quality cost.',
+            '**Streaming responses.** Time to *first* token is what a user perceives as speed. Streaming leaves total time unchanged and transforms the experience.',
+            '**A timeout and a fallback.** Model servers stall. Decide in advance what the application returns when one does.',
+          ],
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'Do not build this yourself',
+          body: 'Continuous batching, paged attention and KV-cache management are hard to get right and already solved by vLLM, TGI and the hosted APIs. Write your own serving loop only once you can state precisely what those do not give you.',
+        },
         {
           kind: 'table',
           head: ['', 'Hosted API', 'Self-hosted'],
@@ -115,7 +151,7 @@ def health() -> dict:
       title: 'Latency, throughput and cost control',
       module: 'ai-engineering',
       level: 'expert',
-      minutes: 10,
+      minutes: 11,
       summary: 'Caching, batching, model routing, fallbacks and the numbers to watch.',
       why: 'LLM features fail in production on economics and latency far more often than on quality. These are the levers, roughly in order of return on effort.',
       prerequisites: ['serving-and-inference', 'llm-apis-and-parameters'],
@@ -126,6 +162,38 @@ def health() -> dict:
       ],
       tags: ['cost', 'latency', 'caching', 'routing'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'These three are one problem with three faces, and improving any of them usually costs you another. Treating them as separate goals is how teams end up with a system that is fast, correct and unaffordable.',
+        },
+        {
+          kind: 'text',
+          body: 'Be precise about the words. **Latency** is how long one request takes. **Throughput** is how many requests finish per second. They are not inverses: batching makes throughput rise and individual latency worse at the same time. And the latency that matters is not the mean — it is p95 and p99, because the mean hides exactly the slow tail that users notice and that timeouts fire on.',
+        },
+        {
+          kind: 'heading',
+          text: 'Where the time actually goes',
+        },
+        {
+          kind: 'text',
+          body: 'For generative models, the cost is dominated by **output** tokens, not input. Generation is sequential — each token requires a full forward pass — while the input is processed in parallel in one go. So a prompt three times longer is modestly slower, and an answer three times longer is roughly three times slower. The single most effective latency fix is usually asking for a shorter answer.',
+        },
+        {
+          kind: 'list',
+          items: [
+            '**Time to first token** is what a user experiences as responsiveness. Streaming leaves total time unchanged and transforms perceived speed.',
+            '**Cap the output.** Set max tokens, and ask for the format you want rather than letting the model pad.',
+            '**Cache.** Identical and near-identical requests are more common than teams expect; prompt caching on a long shared prefix cuts both cost and time to first token.',
+            '**Route by difficulty.** Send the easy majority to a small model and escalate only what needs it. This is usually the largest single cost reduction available.',
+          ],
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'Cost per outcome, not per token',
+          body: 'Price per million tokens is the wrong unit. A cheaper model that needs three attempts, a longer prompt and a human correction is more expensive than the model it replaced. Measure cost per successfully completed task, and the comparison usually reverses.',
+        },
         {
           kind: 'table',
           head: ['Lever', 'Typical effect', 'Trade-off'],
@@ -206,7 +274,7 @@ def complete(task: str, text: str) -> str:
       title: 'Observability for AI systems',
       module: 'ai-engineering',
       level: 'advanced',
-      minutes: 9,
+      minutes: 11,
       summary: 'Tracing, logging, online evaluation and the feedback loop that improves the system.',
       why: 'You cannot debug what you cannot see, and LLM failures are silent: the response is always well-formed. Observability is what makes quality regressions visible at all.',
       prerequisites: ['genai-evaluation'],
@@ -217,6 +285,37 @@ def complete(task: str, text: str) -> str:
       ],
       tags: ['observability', 'tracing', 'logging', 'monitoring'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'A conventional service tells you when it is broken: the status code is 500, the latency spikes, the queue backs up. An AI system fails silently. It returns 200, in good English, confidently, and wrong. Nothing in ordinary monitoring catches that, which is why observability for these systems has to be built rather than configured.',
+        },
+        {
+          kind: 'text',
+          body: 'There are two separate jobs and conflating them is the usual mistake. **Observability** is knowing what happened in production. **Evaluation** is knowing whether a change is an improvement, before it ships. One is a telescope, the other is a test suite, and you need both.',
+        },
+        {
+          kind: 'heading',
+          text: 'What to record on every call',
+        },
+        {
+          kind: 'text',
+          body: 'Log the full trace, not just the answer: the input, the resolved prompt, the model and version, retrieved context, tool calls and their results, the output, token counts, latency and cost. The reason to capture the resolved prompt rather than the template is that debugging almost always comes down to discovering what the model actually saw, which is rarely what you thought you sent.',
+        },
+        {
+          kind: 'heading',
+          text: 'Building the evaluation set',
+        },
+        {
+          kind: 'text',
+          body: 'Start with twenty cases you care about and grow it from production failures: every time something goes wrong, the fix is a code change *and* a new case. Within a few months this becomes the most valuable artefact you own, because it encodes everything you have learned about how the system fails. Run it on every prompt change, model change and retrieval change — all three regress, and model changes regress without you doing anything.',
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'Silent provider updates',
+          body: 'A hosted model can change beneath a stable version string. If you have no evaluation suite running on a schedule, the first report of the regression will come from a user. Pin versions where the provider allows it, and run the suite regularly regardless.',
+        },
         {
           kind: 'list',
           items: [
@@ -366,7 +465,7 @@ def traced_answer(question: str, user_id: str) -> dict:
       title: 'Shipping the interface: streaming, state and trust',
       module: 'ai-engineering',
       level: 'intermediate',
-      minutes: 8,
+      minutes: 11,
       summary:
         'Gradio and Streamlit for a demo, a real front end for a product, and the interaction patterns a stochastic system needs.',
       why: 'A model behind a curl command convinces nobody. The interface is where an AI feature is judged, and generative output needs patterns ordinary UI does not: visible waiting, citations, correction and an escape hatch.',
@@ -378,6 +477,41 @@ def traced_answer(question: str, user_id: str) -> dict:
       ],
       tags: ['gradio', 'streamlit', 'streaming', 'ux'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'An AI feature is a product surface over a component that is probabilistic, sometimes slow, and occasionally confidently wrong. Conventional interface design assumes none of those, so the patterns that work here are mostly about setting expectations and making recovery cheap.',
+        },
+        {
+          kind: 'heading',
+          text: 'Latency is a design problem, not only an engineering one',
+        },
+        {
+          kind: 'text',
+          body: 'A multi-second wait with a spinner feels broken; the same wait with tokens streaming feels fast. Nothing about the total time changed. Where streaming is impossible, show the stages — retrieving, reading, drafting — because a progress signal that names what is happening reads as working rather than hung. And decide what the interface does when the model times out, because it will.',
+        },
+        {
+          kind: 'heading',
+          text: 'Design for being wrong',
+        },
+        {
+          kind: 'text',
+          body: 'The output will sometimes be incorrect, so the interface has to make that cheap rather than hide it. Cite sources and link them so a claim can be checked in one click. Prefer presenting a draft the user edits over an action taken on their behalf. Keep anything irreversible behind an explicit confirmation that states what will happen. And make correction a first-class action rather than making the user start again.',
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'Say what it can do before they ask',
+          body: 'An empty box invites the two worst outcomes: a request the system cannot serve, and no request at all. Example prompts, a short statement of scope, and visible limits do more for perceived quality than most model improvements.',
+        },
+        {
+          kind: 'heading',
+          text: 'Feedback is the asset',
+        },
+        {
+          kind: 'text',
+          body: 'A thumbs-up control is nearly free to add and becomes the raw material for your evaluation set, your prompt changes and any future fine-tuning. Capture the full trace alongside the rating, not just the verdict — a negative rating with no record of what the model saw is unusable. This is the cheapest thing you can build that compounds.',
+        },
         {
           kind: 'table',
           head: ['Tool', 'Good for', 'Stops being right when'],

@@ -194,7 +194,7 @@ print(f"R2   {r2_score(y_test, pred):.3f}")`,
       title: 'Splits, leakage and honest evaluation',
       module: 'evaluation',
       level: 'intermediate',
-      minutes: 8,
+      minutes: 11,
       summary: 'Train/validation/test, the kinds of leakage, and how to design a split that mirrors deployment.',
       why: 'Most "great model, terrible production performance" stories are a split problem, not a model problem. Leakage is the single most expensive mistake in applied ML.',
       prerequisites: ['overfitting-and-regularisation'],
@@ -205,6 +205,46 @@ print(f"R2   {r2_score(y_test, pred):.3f}")`,
       ],
       tags: ['leakage', 'validation', 'splits'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'A test score is a prediction about data you have not seen. The split is what makes that prediction honest, and almost every inflated result in machine learning comes from a split that quietly let the model see something it should not have.',
+        },
+        {
+          kind: 'text',
+          body: 'The baseline arrangement is three sets. **Train** fits the parameters. **Validation** chooses between models and hyperparameters. **Test** is touched once, at the end, to report a number. The reason validation and test are separate is subtle but important: if you pick the model that scores best on a set, that score is no longer an unbiased estimate of anything — you optimised against it. Run forty experiments against your test set and you have fitted to it by hand.',
+        },
+        {
+          kind: 'heading',
+          text: 'When a random split is wrong',
+        },
+        {
+          kind: 'text',
+          body: 'Random splitting assumes rows are independent and interchangeable. Often they are not, and then a random split leaks:',
+        },
+        {
+          kind: 'list',
+          items: [
+            '**Time matters.** Shuffle a time series and the model trains on the future to predict the past. Split by date instead.',
+            '**Rows share a group.** Several scans from one patient, several sessions from one user, several photos of one product. If the same group appears on both sides, the model can recognise the group rather than the pattern. Split by group.',
+            '**The classes are imbalanced.** A random split can leave a fold with almost none of the rare class. Stratify so every fold keeps the class ratio.',
+            '**There are near-duplicates.** Scraped data often contains the same record twice. Deduplicate before splitting or the test set is partly the training set.',
+          ],
+        },
+        {
+          kind: 'heading',
+          text: 'Why cross-validation, and when not to',
+        },
+        {
+          kind: 'text',
+          body: 'A single validation split gives one noisy estimate, and on a small dataset the number moves depending on which rows landed where. K-fold runs the split k times so every row is validated exactly once, which gives both a mean and a spread. The spread is the part people ignore and the part that matters: two models whose means differ by less than the fold-to-fold variation are not meaningfully different.',
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'The pipeline is not optional',
+          body: 'Scaling, imputing or encoding before splitting leaks test statistics into training. Wrapping every transformation in a pipeline and passing the pipeline to cross-validation is what makes this structurally impossible rather than something you have to remember.',
+        },
         {
           kind: 'list',
           items: [

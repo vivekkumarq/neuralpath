@@ -19,7 +19,7 @@ import { Icon } from '../../shared/icon';
         </nav>
 
         <header class="head">
-          <p class="eyebrow">Stage {{ data.stage }} of {{ total - 1 }}</p>
+          <p class="eyebrow">Stage {{ data.stage }} · {{ total }} stages</p>
           <h1>{{ data.title }}</h1>
           <p class="lede">{{ data.description }}</p>
 
@@ -53,6 +53,7 @@ import { Icon } from '../../shared/icon';
 
                 <p>{{ topic.summary }}</p>
 
+                <p class="outcomes-label">After this you can</p>
                 <ul class="outcomes" role="list">
                   @for (outcome of topic.outcomes; track outcome) {
                     <li>{{ outcome }}</li>
@@ -151,6 +152,35 @@ import { Icon } from '../../shared/icon';
 
     .topics p {
       margin: var(--sp-2) 0 var(--sp-3);
+    }
+
+    /* Without this the card showed three bare arrows and nothing saying what
+       they were. The topic page labels the same list; the card did not. */
+    /* The status marker was wrapping onto its own line on a phone, leaving a
+       stray arrow under the title. It is a fixed-size badge, so it should
+       never wrap; the title is what shrinks. */
+    .topics .spread {
+      flex-wrap: nowrap;
+      align-items: flex-start;
+      gap: var(--sp-3);
+    }
+
+    .topics .title {
+      min-width: 0;
+    }
+
+    .topics .state {
+      flex: none;
+    }
+
+    .outcomes-label {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: var(--track-caps);
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: var(--sp-2);
     }
 
     .outcomes {

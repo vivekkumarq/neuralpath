@@ -475,7 +475,7 @@ curl http://localhost:8000/v1/chat/completions \\
       title: 'Choosing a model: quality, latency and cost',
       module: 'llm-engineering',
       level: 'advanced',
-      minutes: 8,
+      minutes: 11,
       summary:
         'Frontier against open weights, benchmarks against your own evaluation, and the arithmetic that decides.',
       why: 'Model choice is the single biggest lever on both quality and the bill, and it is usually made on a leaderboard screenshot. The decision is a measurement on your own task, against your own latency and cost budget.',
@@ -487,6 +487,43 @@ curl http://localhost:8000/v1/chat/completions \\
       ],
       tags: ['model selection', 'benchmarks', 'cost', 'routing'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'Choosing a model is a procurement decision with engineering consequences, and the instinct to reach for the largest available one is usually wrong. The right question is not which model is best, but which is the cheapest that passes your evaluation.',
+        },
+        {
+          kind: 'text',
+          body: 'That phrasing matters because it forces the evaluation to exist first. Without one, every comparison collapses into vibes and benchmark scores that were measured on something other than your task.',
+        },
+        {
+          kind: 'heading',
+          text: 'What actually separates models',
+        },
+        {
+          kind: 'list',
+          items: [
+            '**Capability** on *your* task, measured on your own cases. Public leaderboards correlate loosely and are contaminated by training on the benchmarks.',
+            '**Context window**, which decides how much you can put in a prompt — though usable quality often degrades well before the stated limit.',
+            '**Latency**, which is frequently the deciding factor for anything interactive.',
+            '**Price**, remembering that output tokens usually cost several times input tokens.',
+            '**Where it runs.** A hosted API is fastest to start; an open-weights model you serve yourself is the answer when data cannot leave, or at volumes where per-token pricing stops making sense.',
+          ],
+        },
+        {
+          kind: 'heading',
+          text: 'The pattern that saves the most money',
+        },
+        {
+          kind: 'text',
+          body: 'Most workloads are not uniform: a large majority of requests are easy and a small minority are hard. Routing the easy ones to a small cheap model and escalating only on low confidence or an explicit check typically cuts cost by a large factor while leaving quality on the hard cases intact. It is more engineering than picking one model for everything, and it is almost always worth it at volume.',
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'Assume you will switch',
+          body: 'This field moves fast enough that today best choice will not be next year. Keep provider-specific calls behind one interface, keep prompts in files rather than scattered through code, and keep the evaluation suite runnable against any model. Switching should be a configuration change and an evaluation run, not a rewrite.',
+        },
         {
           kind: 'table',
           head: ['', 'Frontier API', 'Open weights, hosted', 'Open weights, self-hosted'],

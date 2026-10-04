@@ -18,7 +18,7 @@ export const generativeAiModule: Module = {
       title: 'Foundation models and how they are trained',
       module: 'generative-ai',
       level: 'intermediate',
-      minutes: 9,
+      minutes: 11,
       summary: 'Pretraining, instruction tuning and preference alignment — the three stages behind an assistant.',
       why: 'Model behaviour makes sense once you know which training stage produced it. Refusals, formatting habits, sycophancy and knowledge cutoffs are all artefacts of a specific stage.',
       prerequisites: ['transformer-architecture'],
@@ -29,6 +29,37 @@ export const generativeAiModule: Module = {
       ],
       tags: ['foundation models', 'rlhf', 'pretraining'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'For most of machine learning history, a model was built for a task: a spam classifier could not caption a photograph, and a translation model could not answer a question. A foundation model inverts that. It is pretrained once on an enormous unlabelled corpus, with no task in mind, and adapted afterwards to many.',
+        },
+        {
+          kind: 'text',
+          body: 'What makes this possible is self-supervision. Predicting the next token needs no annotation, so the training set is as large as the text you can gather — and at that scale the model has to learn syntax, facts, reasoning patterns and style simply to predict well. Capability emerges as a side effect of compression.',
+        },
+        {
+          kind: 'heading',
+          text: 'Scaling, and what it bought',
+        },
+        {
+          kind: 'text',
+          body: 'Performance improves predictably with parameters, data and compute — smoothly enough that the curve can be extrapolated before a run starts. What was not predictable is that some abilities appear abruptly: arithmetic, instruction following and in-context learning are near-absent below a certain scale and then present above it. **In-context learning** is the most consequential of these, because it is what lets you steer a model with examples in the prompt instead of gradient updates.',
+        },
+        {
+          kind: 'heading',
+          text: 'What this changes for you',
+        },
+        {
+          kind: 'text',
+          body: 'The practical consequence is that most AI work is no longer training. It is selecting a model, giving it the right context, constraining its output, evaluating it and running it affordably. The stages that follow — prompting, retrieval, fine-tuning, agents, serving — are all forms of adaptation, and they exist because the pretraining step is now something you buy rather than do.',
+        },
+        {
+          kind: 'note',
+          tone: 'info',
+          title: 'The limits come from the same source',
+          body: 'A model trained to predict likely text produces likely text, which is not the same as true text — that is hallucination, and it is intrinsic rather than a bug to be patched. Its knowledge stops at its training cutoff, it absorbed the biases of its corpus, and it has no way to tell you which parts it is confident about. Every one of those is a direct consequence of how it was made.',
+        },
         {
           kind: 'steps',
           items: [
@@ -83,7 +114,7 @@ export const generativeAiModule: Module = {
       title: 'Prompt engineering that survives contact with production',
       module: 'generative-ai',
       level: 'intermediate',
-      minutes: 11,
+      minutes: 12,
       summary: 'Instruction structure, few-shot examples, reasoning prompts and the failure modes of each.',
       why: 'Prompting is the cheapest and fastest way to change model behaviour, and the first thing to exhaust before considering retrieval or fine-tuning. Done carelessly it is also the least reliable.',
       prerequisites: ['foundation-models'],
@@ -94,6 +125,37 @@ export const generativeAiModule: Module = {
       ],
       tags: ['prompting', 'few-shot', 'chain of thought'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'A prompt is not a wish. It is the entire input to a function whose behaviour you cannot otherwise change, which makes it the only control surface you have over a model you did not train. Treating it as configuration rather than conversation is most of what separates a demo from something that works reliably.',
+        },
+        {
+          kind: 'text',
+          body: 'A model continues text in the way its training data suggests. So the real question behind every prompting technique is: what context makes the desired continuation the most likely one? Specificity helps because it narrows the space of plausible continuations. Examples help because they establish a pattern the model can extend. A role helps because it selects a register.',
+        },
+        {
+          kind: 'heading',
+          text: 'The techniques, and why each works',
+        },
+        {
+          kind: 'text',
+          body: '**Zero-shot** is an instruction alone, and it is enough for anything common. **Few-shot** adds two to five worked examples, which is the fastest way to pin down an output *format* — far more reliable than describing the format in words. **Chain of thought** asks for reasoning before the answer; it works because the intermediate tokens are themselves computation, giving the model somewhere to do work before committing. **Decomposition** splits a task into several calls, which beats one elaborate prompt whenever a step can fail independently.',
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'Put the instruction last when context is long',
+          body: 'Models attend unevenly across a long context, and material in the middle is weighted least. With a large document, place the instruction after it rather than before, and state the output format at the very end where it is least likely to be lost.',
+        },
+        {
+          kind: 'heading',
+          text: 'Treat prompts as code',
+        },
+        {
+          kind: 'text',
+          body: 'A prompt that is tuned by hand until the three examples you tried look right is not engineering. Keep a file of cases with expected properties, run it on every change, and version the prompt alongside the application. Prompts regress exactly like code — and they also regress when the provider updates the model underneath you, which is the failure mode nobody plans for.',
+        },
         {
           kind: 'list',
           items: [

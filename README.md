@@ -2,7 +2,7 @@
 
 **A structured AI/ML engineering curriculum — from machine learning fundamentals to LLM, RAG and agent engineering.**
 
-Live site: **https://vivekkumarq.github.io/neuralpath/**
+Live site: **https://neuralpath.duckdns.org**
 
 A static, interactive learning platform that answers one question in order: *I know little or nothing about AI/ML — where do I start, what comes next, why does it matter, and how do I practise it?*
 
@@ -10,26 +10,28 @@ A static, interactive learning platform that answers one question in order: *I k
 
 ## What it covers
 
-Sixteen stages, in dependency order. Each one exists because the previous one runs out.
+18 stages and 88 topics, in dependency order. Each stage exists because the previous one runs out.
 
-| Stage | Module | What it covers |
+| Stage | Module | Topics |
 | --- | --- | --- |
-| 0 | Engineering Foundations | Python for ML, environments and reproducibility, git, shell and remote machines, APIs and HTTP |
-| 1 | Mathematics for ML | Vectors and matrices, probability and statistics, derivatives and gradient descent |
-| 2 | Data and Feature Engineering | NumPy, pandas, cleaning and encoding, feature engineering, EDA |
-| 3 | Machine Learning | Learning fundamentals, linear and logistic regression, trees and ensembles, SVM/KNN/Naive Bayes, clustering and PCA, overfitting and cross-validation |
-| 4 | Model Evaluation | Classification metrics and the confusion matrix, regression metrics, splits and leakage |
-| 5 | Deep Learning | Perceptron to network, activations, backpropagation, optimisers and schedules, regularisation, frameworks |
-| 6 | Computer Vision | Images and convolution, CNN architectures, detection and segmentation, transfer learning and ViTs |
-| 7 | NLP | Tokenisation, bag of words and TF-IDF, word embeddings, RNNs and the road to attention |
-| 8 | Transformers | Self-attention, multi-head attention and position, the full transformer block |
-| 9 | Generative AI | Foundation models, prompt engineering, structured output and tool calling, evaluation and hallucination |
-| 10 | LLM Engineering | Tokens and context, sampling parameters, embeddings, prompt infrastructure and caching |
-| 11 | RAG | The pipeline, chunking, vector and hybrid search, reranking and context, evaluation |
-| 12 | Fine-Tuning | Prompting vs RAG vs fine-tuning, supervised fine-tuning, LoRA and QLoRA |
-| 13 | AI Agents | What an agent is, tool design, memory and orchestration, reliability and guardrails |
-| 14 | Production AI Engineering | Serving and inference, latency/throughput/cost, observability, prompt injection and privacy |
-| 15 | MLOps and Career | Experiment tracking, pipelines and CI/CD, drift and retraining, which role is which |
+| 0 | Start Here: What AI Actually Is | AI, machine learning, deep learning: what the words mean, How a machine actually learns, Where AI is actually used, and who builds it |
+| 1 | Engineering Foundations | Your first Python, from nothing, Python for machine learning, Environments, packaging and reproducibility, Git, GitHub and working in the open, Shell, Linux and remote machines, APIs, JSON and HTTP |
+| 2 | Mathematics for ML | Vectors, matrices and why everything is one, Probability and statistics you will actually use, Derivatives, gradients and optimisation |
+| 3 | Data and Feature Engineering | NumPy: arrays, shapes and vectorisation, pandas: loading, reshaping and grouping data, Cleaning: missing values, categories and scaling, Feature engineering, Exploratory data analysis |
+| 4 | Machine Learning | What learning means, Linear and logistic regression, Decision trees, random forests and gradient boosting, SVM, KNN and Naive Bayes, Clustering and dimensionality reduction, Overfitting, bias, variance and cross-validation, Anomaly and outlier detection, Time series forecasting, Recommender systems |
+| 5 | Model Evaluation | Classification metrics and the confusion matrix, Regression metrics, Splits, leakage and honest evaluation |
+| 6 | Deep Learning | From perceptron to network, Activation functions, Backpropagation, Optimisers, learning rates and batch size, Dropout, normalisation and early stopping, PyTorch, TensorFlow and the framework question, Autoencoders and self-supervised learning |
+| 7 | Computer Vision | Images as tensors, and what convolution does, CNN architectures and feature hierarchies, Detection and segmentation, Transfer learning and vision transformers |
+| 8 | Natural Language Processing | Tokenisation and text preprocessing, Bag of words and TF-IDF, Word embeddings, RNNs, LSTMs and the road to attention, Classical NLP tasks: tagging, entities and topics |
+| 9 | Transformers | Self-attention: query, key, value, Multi-head attention and positional encoding, The full transformer block |
+| 10 | Generative AI | Foundation models and how they are trained, Prompt engineering that survives contact with production, Structured output and tool calling, Evaluating generative systems, Beyond text: vision, speech and image generation, Speech and audio, from waveform to transcript |
+| 11 | LLM Engineering | Tokens, context windows and cost, Inference parameters: temperature, top-k, top-p, Embeddings: text as geometry, Prompt infrastructure: templates, versions and caching, Hugging Face and running open models, Choosing a model: quality, latency and cost |
+| 12 | Retrieval-Augmented Generation | The RAG pipeline end to end, Chunking strategies, Vector search, filtering and hybrid retrieval, Reranking and context construction, Evaluating a RAG system, Query rewriting, expansion and graph retrieval |
+| 13 | Fine-Tuning and Adaptation | Prompting vs RAG vs fine-tuning, Supervised fine-tuning and instruction tuning, LoRA, QLoRA and parameter-efficient tuning |
+| 14 | Reinforcement Learning | Agents, rewards and the Markov decision process, Deep Q-networks, policy gradients and PPO, RLHF, reward models and DPO |
+| 15 | AI Agents | What an agent actually is, Tools: design, execution and errors, Memory, state and orchestration, Reliability, guardrails and evaluation, Orchestration frameworks: LangChain, LangGraph and MCP |
+| 16 | Production AI Engineering | Serving models and exposing them as APIs, Latency, throughput and cost control, Observability for AI systems, Prompt injection, data privacy and abuse, Shipping the interface: streaming, state and trust, Ethics, bias and fairness, Governance and regulation |
+| 17 | MLOps and Career | Experiment tracking and model versioning, Pipelines and CI/CD for ML, Monitoring, drift and retraining, The roles: who does what |
 
 Plus **15 projects** (beginner to expert), an **interview bank** across 17 categories, a **glossary**, a curated **resource library**, and a dated **"what to learn now"** page.
 
@@ -97,7 +99,7 @@ Content is data, not markup: adding a topic means adding an object to a module f
 
 ## Deployment
 
-Pushing to `main` triggers `.github/workflows/deploy.yml`, which runs the tests, regenerates the sitemap, builds with `--base-href /neuralpath/`, copies `index.html` to `404.html` so deep links survive a refresh on GitHub Pages, adds `.nojekyll`, and publishes to GitHub Pages.
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which runs the tests, regenerates the sitemap, builds with `--base-href /`, copies `index.html` to `404.html` so deep links survive a refresh on GitHub Pages, adds `.nojekyll`, and publishes to GitHub Pages.
 
 To deploy elsewhere, build with the base href for that host and serve `dist/neuralpath/browser` as static files with an SPA fallback to `index.html`.
 
@@ -105,7 +107,7 @@ To deploy elsewhere, build with the base href for that host and serve `dist/neur
 
 All explanations, examples, diagrams, quizzes, projects and interview answers are original work written for this site. Where a claim belongs to someone else — a paper, a benchmark, a documented API behaviour — it is linked to its primary source. The learning structure was informed by two external Udemy courses, which are credited and linked on the resources page as optional companions; no course material is reproduced, and the site stands on its own.
 
-The [what to learn now](https://vivekkumarq.github.io/neuralpath/now) page carries a review date, because that kind of claim expires. If it looks stale, trust the linked source over this site.
+The [what to learn now](https://neuralpath.duckdns.org/now) page carries a review date, because that kind of claim expires. If it looks stale, trust the linked source over this site.
 
 ## Corrections
 

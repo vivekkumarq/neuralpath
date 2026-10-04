@@ -193,7 +193,7 @@ export const orientationModule: Module = {
       title: 'Where AI is actually used, and who builds it',
       module: 'orientation',
       level: 'beginner',
-      minutes: 7,
+      minutes: 10,
       summary:
         'The applications you already use, the shape of a real AI project, and the roles that do the work.',
       why: 'It is much easier to learn a subject when you can see where it ends up. This also tells you which parts of the curriculum matter most for the job you actually want.',
@@ -205,6 +205,37 @@ export const orientationModule: Module = {
       ],
       tags: ['orientation', 'careers', 'applications'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'Most people have used machine learning hundreds of times today without noticing, because the successful applications do not announce themselves. Knowing what shape a problem has to take before it is solvable this way is the most transferable thing in this stage.',
+        },
+        {
+          kind: 'text',
+          body: 'Nearly every deployed system is one of a small number of shapes. **Classification** picks a label — spam or not, which category, which language. **Regression** predicts a number — delivery time, price, demand. **Ranking** orders a list — search results, a feed, recommendations. **Detection** finds things inside something larger — a face in a photo, a defect on a production line. **Generation** produces new content. If you can state your problem as one of those, there is a well-trodden path; if you cannot, that is a signal worth taking seriously.',
+        },
+        {
+          kind: 'heading',
+          text: 'What a real project looks like',
+        },
+        {
+          kind: 'text',
+          body: 'The model is a small fraction of the work. A project runs roughly: decide what decision the prediction will change; find out whether the data to support it exists; build a baseline so you know what "good" means; get data into usable shape; train something; evaluate it against the baseline and against the cost of being wrong; ship it behind something that can be turned off; then watch it, because the world moves and the model does not.',
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'The question that saves the most time',
+          body: 'What decision changes because of this prediction? If nobody can answer, the project has no value regardless of accuracy — a dashboard nobody acts on is a cost centre. This one question kills more bad projects earlier than any technical review.',
+        },
+        {
+          kind: 'heading',
+          text: 'Where it genuinely does not fit',
+        },
+        {
+          kind: 'text',
+          body: 'Problems with a known rule — tax calculation, VAT, a business policy — should be coded, not learned; a learned approximation of a rule you already have is strictly worse. Problems with no examples cannot be trained. Problems where a wrong answer is unacceptable and unreviewable need a different design, because the error rate is never zero. And problems where you could not explain a decision to the person affected may be legally unusable regardless of accuracy.',
+        },
         {
           kind: 'table',
           head: ['Shape', 'What it predicts', 'You have used it as'],

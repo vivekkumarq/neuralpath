@@ -177,7 +177,7 @@ print(softmax(np.array([1000.0, 999.0])).round(3))   # [0.731 0.269] — no over
       title: 'Backpropagation',
       module: 'deep-learning',
       level: 'advanced',
-      minutes: 9,
+      minutes: 11,
       summary: 'The chain rule applied backwards through a computation graph — how credit is assigned.',
       why: 'Backpropagation is the algorithm that makes training deep models feasible. Without it you are guessing at the cause of every training failure.',
       prerequisites: ['calculus-and-gradients', 'activation-functions'],
@@ -188,6 +188,42 @@ print(softmax(np.array([1000.0, 999.0])).round(3))   # [0.731 0.269] — no over
       ],
       tags: ['backpropagation', 'gradients', 'autograd'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'Training a network means answering one question for every weight in it: if I nudge this weight slightly, does the loss go up or down, and by how much? With millions of weights, computing that separately for each one is hopeless. Backpropagation computes all of them in a single backward pass, at roughly the cost of one forward pass.',
+        },
+        {
+          kind: 'text',
+          body: 'The trick is the chain rule. A network is a chain of functions, and the derivative of a composed function is the product of the derivatives of its parts. So if you know how the loss changes with respect to a layer output, and you know how that output changes with respect to its input, you can multiply the two and continue backwards. Each layer receives the gradient from the layer above it, uses it to compute the gradient for its own weights, and passes a transformed version further back.',
+        },
+        {
+          kind: 'math',
+          expr: '∂L/∂w = (∂L/∂y) · (∂y/∂z) · (∂z/∂w)',
+          note: 'Loss to output, output to pre-activation, pre-activation to weight. Every layer is this same three-step product, which is why one algorithm handles any depth.',
+        },
+        {
+          kind: 'heading',
+          text: 'Why the forward pass has to be remembered',
+        },
+        {
+          kind: 'text',
+          body: 'Those local derivatives usually depend on the values the layer saw on the way forward. The gradient through a ReLU, for example, is 1 where the input was positive and 0 where it was not — so you cannot compute it without knowing what the input was. This is why training needs far more memory than inference: every intermediate activation is held until the backward pass consumes it. It is also why batch size is the first thing to cut when training runs out of memory.',
+        },
+        {
+          kind: 'heading',
+          text: 'Where it goes wrong',
+        },
+        {
+          kind: 'text',
+          body: 'Because the gradient is a *product* of many terms, long chains misbehave. If the terms are consistently below one, the product shrinks towards zero and early layers stop learning — the **vanishing gradient**. If they are above one, it explodes and training diverges into NaN. Nearly every architectural device you will meet exists to manage this: ReLU over sigmoid, residual connections, normalisation layers, careful initialisation, and gradient clipping.',
+        },
+        {
+          kind: 'note',
+          tone: 'info',
+          title: 'You will not implement this',
+          body: 'Every framework builds a graph of operations as you run the forward pass and walks it backwards on `loss.backward()`. The reason to understand the mechanism anyway is debugging: when a loss goes NaN, when a layer never updates, or when a detached tensor silently cuts the graph, the fix only makes sense if you know what the backward pass is doing.',
+        },
         {
           kind: 'steps',
           items: [
@@ -449,7 +485,7 @@ model.load_state_dict(best_state)`,
       title: 'PyTorch, TensorFlow and the framework question',
       module: 'deep-learning',
       level: 'intermediate',
-      minutes: 7,
+      minutes: 10,
       summary: 'What each framework is good at, and the parts of the ecosystem you will actually import.',
       why: 'Research and most open model releases are PyTorch; a large body of production systems is TensorFlow. Knowing the shape of both keeps you employable and lets you read any codebase.',
       prerequisites: ['neural-network-basics'],
@@ -460,6 +496,37 @@ model.load_state_dict(best_state)`,
       ],
       tags: ['pytorch', 'tensorflow', 'keras', 'frameworks'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'A deep learning framework exists to do three things you would otherwise write yourself: run tensor maths on a GPU, compute gradients automatically, and provide the layers and optimisers everyone needs. Everything else it offers is convenience on top of those three.',
+        },
+        {
+          kind: 'text',
+          body: 'The idea that makes it work is the **computation graph**. As your forward pass runs, the framework records every operation and what it was applied to. Calling `.backward()` walks that record in reverse, applying the chain rule at each step, and deposits a gradient on every tensor that asked for one. You never write a derivative; you write the forward computation and the graph gives you the backward one.',
+        },
+        {
+          kind: 'heading',
+          text: 'The four pieces of every training loop',
+        },
+        {
+          kind: 'text',
+          body: 'A **Dataset** says how to fetch and transform one example. A **DataLoader** batches, shuffles and loads them in parallel worker processes. A **Module** holds parameters and defines the forward pass. An **optimiser** holds the update rule. The loop that joins them — zero the gradients, forward, compute loss, backward, step — is the same five lines in almost every project, which is why higher-level wrappers exist to write it for you.',
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'Zero the gradients',
+          body: 'Gradients accumulate by default rather than being replaced. Forget `optimizer.zero_grad()` and every step applies the sum of all gradients so far — training appears to run and the model never converges, with no error raised. This is the most common silent bug in PyTorch code.',
+        },
+        {
+          kind: 'heading',
+          text: 'Which one to learn',
+        },
+        {
+          kind: 'text',
+          body: 'PyTorch dominates research and has largely won in industry too; if you learn one, learn it. JAX is strong where functional transformation and TPU scale matter. TensorFlow remains in large existing deployments. The concepts transfer almost completely between them, so the choice matters far less than it appears from outside — and in practice much applied work now happens a level up, through libraries like Hugging Face Transformers, where you rarely write a training loop at all.',
+        },
         {
           kind: 'table',
           head: ['', 'PyTorch', 'TensorFlow / Keras'],

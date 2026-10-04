@@ -171,7 +171,7 @@ merged = df.merge(plans, on="plan", how="left", validate="many_to_one")`,
       title: 'Cleaning: missing values, categories and scaling',
       module: 'data',
       level: 'beginner',
-      minutes: 10,
+      minutes: 12,
       summary: 'Imputation, encoding and normalisation — with the fit/transform rule that keeps them honest.',
       why: 'Models cannot read blanks, strings or wildly different scales. How you fill, encode and scale is a modelling decision, and doing it before the split leaks information from the test set.',
       prerequisites: ['pandas-dataframes'],
@@ -182,6 +182,37 @@ merged = df.merge(plans, on="plan", how="left", validate="many_to_one")`,
       ],
       tags: ['preprocessing', 'encoding', 'scaling'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'This is where most of the time goes, and the ratio is not a failure of planning — it is the job. A model is a function of its input, so every decision made here is baked into everything downstream, and a modelling trick almost never recovers from a data decision made badly.',
+        },
+        {
+          kind: 'text',
+          body: 'Before changing anything, find out why the data looks the way it does. A missing value can mean the sensor failed, the question was skipped, the field did not exist before 2023, or the value was zero and got lost. Those have different correct treatments, and no amount of staring at the distribution will distinguish them — it is a question for whoever produced the data.',
+        },
+        {
+          kind: 'heading',
+          text: 'Missing values',
+        },
+        {
+          kind: 'text',
+          body: 'The mechanism determines the fix. If values are missing completely at random, dropping rows is unbiased but wasteful. If missingness depends on an observed variable, imputation conditioned on that variable works. If it depends on the *unobserved* value itself — high earners declining to state income — no imputation is safe, and the honest move is to model missingness explicitly with an indicator column. That indicator is often predictive in its own right.',
+        },
+        {
+          kind: 'heading',
+          text: 'Outliers are not automatically errors',
+        },
+        {
+          kind: 'text',
+          body: 'An impossible value is an error: a negative age, a heart rate of 400. A merely extreme value may be the most important row in the dataset — the fraud, the failure, the outage. Deleting outliers because they are inconvenient is how anomaly signal gets quietly removed. Decide by asking whether the value is *possible*, not whether it is *rare*.',
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'Fit on train, apply to everything',
+          body: 'Every statistic used to clean — a mean for imputation, a scaler range, a category list — must come from the training split alone. Computing it over the full dataset is the most common leak in applied machine learning, and it inflates every score you report afterwards. Put the steps in a pipeline so it cannot happen by accident.',
+        },
         { kind: 'heading', text: 'Missing values' },
         {
           kind: 'table',
@@ -286,7 +317,7 @@ print(model.score(X_test, y_test))`,
       title: 'Feature engineering',
       module: 'data',
       level: 'intermediate',
-      minutes: 8,
+      minutes: 10,
       summary: 'Turning raw columns into signal: ratios, aggregates, time features and interaction terms.',
       why: 'On tabular problems, a well-built feature set with a simple model usually beats a raw feature set with a complicated one. Features are where domain knowledge enters the model.',
       prerequisites: ['cleaning-and-preprocessing'],
@@ -297,6 +328,37 @@ print(model.score(X_test, y_test))`,
       ],
       tags: ['features', 'tabular', 'domain knowledge'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'A model can only use what you put in front of it. Feature engineering is the work of turning raw columns into inputs that expose the structure you believe exists — and on tabular problems it routinely moves accuracy more than swapping one model for another.',
+        },
+        {
+          kind: 'text',
+          body: 'The clearest example is a timestamp. As a raw integer it is nearly useless: the model would have to learn that certain enormous numbers mean "Saturday". Split it into hour of day, day of week, month, and a holiday flag, and the pattern becomes something a tree can split on in one step. Nothing was added to the data; it was only made visible.',
+        },
+        {
+          kind: 'heading',
+          text: 'The common moves',
+        },
+        {
+          kind: 'text',
+          body: '**Categoricals** need encoding. One-hot is safe for low cardinality; for high cardinality it explodes the column count, and target encoding — replacing a category with the mean outcome for that category — is the usual answer, computed strictly inside the training fold. **Skewed numerics** often benefit from a log transform, because most models care about relative differences and a long tail otherwise dominates. **Ratios and differences** between columns frequently matter more than either column alone: price per square metre beats price and area separately.',
+        },
+        {
+          kind: 'heading',
+          text: 'The mistake that ruins everything',
+        },
+        {
+          kind: 'text',
+          body: 'Every statistic used to build a feature — a mean, a standard deviation, a category frequency — must be computed from training data only, then applied to validation and test. Compute it over the whole dataset first and information about the test set leaks into training. The score improves, and the improvement is imaginary. This is what `Pipeline` exists for: it binds the transformation to the fit so cross-validation cannot accidentally cheat.',
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'Features from the future',
+          body: 'The subtler leak is a feature that would not exist at prediction time. A column like `days_until_cancelled` or `final_invoice_total` predicts churn beautifully in training and cannot be computed when you actually need the prediction. For every feature, ask what the clock said when the value became known.',
+        },
         {
           kind: 'list',
           items: [

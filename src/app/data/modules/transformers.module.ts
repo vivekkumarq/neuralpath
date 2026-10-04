@@ -198,7 +198,7 @@ print(w.round(2))
       title: 'The full transformer block',
       module: 'transformers',
       level: 'advanced',
-      minutes: 10,
+      minutes: 12,
       summary: 'Attention plus feed-forward, residuals, normalisation — and the encoder/decoder family split.',
       why: 'Model names stop being a jumble once you can place them in the encoder-only, decoder-only or encoder-decoder families, because the family determines what a model is good for.',
       prerequisites: ['multi-head-and-position'],
@@ -209,6 +209,41 @@ print(w.round(2))
       ],
       tags: ['transformer', 'bert', 'gpt', 'architecture'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'Attention on its own is a lookup: each position gathers information from the others. A transformer is what you get when you wrap that lookup in the machinery needed to stack it eighty times without the signal degrading, and to make it expressive enough to be worth stacking.',
+        },
+        {
+          kind: 'text',
+          body: 'One block does four things in order: attention mixes information *between* positions; a feed-forward network transforms each position *independently*; and a residual connection plus a normalisation layer wrap each of those two so the block can be stacked. That alternation is the core design — mix across positions, then think about each position on its own, and repeat.',
+        },
+        {
+          kind: 'heading',
+          text: 'Why the feed-forward layer matters more than it looks',
+        },
+        {
+          kind: 'text',
+          body: 'It is easy to treat the feed-forward block as filler between the interesting attention layers, but it holds roughly two thirds of the parameters. It expands each position to about four times the model width, applies a non-linearity, and projects back down. Attention decides *what information to gather*; the feed-forward layer decides *what to do with it*. Work on interpretability increasingly points at these layers as where factual knowledge is stored.',
+        },
+        {
+          kind: 'heading',
+          text: 'Residuals and normalisation',
+        },
+        {
+          kind: 'text',
+          body: 'Every sub-layer is wrapped as `x + Sublayer(norm(x))`. The residual gives the gradient a clean path from the loss all the way to the first layer, exactly as in ResNet — without it, a deep transformer does not train. The normalisation keeps activations in a usable range as they pass through dozens of layers. Modern models put the norm *before* the sub-layer (pre-norm) rather than after, because it makes training markedly more stable at depth.',
+        },
+        {
+          kind: 'text',
+          body: 'There are three arrangements of these blocks, and the choice determines what the model is for. **Encoder-only** models see the whole sequence at once and suit classification and embedding. **Decoder-only** models mask future positions so each token can only attend backwards, which is what makes generation possible — and this is what GPT-style models are. **Encoder-decoder** keeps both, which fits translation and summarisation where input and output are distinct sequences.',
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'The reason it won',
+          body: 'A recurrent network processes a sequence one step at a time, so training cannot be parallelised across the sequence. A transformer computes every position simultaneously. That single property is what made training on internet-scale corpora practical; the quadratic cost of attention was an acceptable price, and most later research is about reducing it.',
+        },
         { kind: 'visual', id: 'transformer', caption: 'One block, sub-layer by sub-layer.' },
         {
           kind: 'list',

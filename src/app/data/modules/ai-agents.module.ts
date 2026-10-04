@@ -107,7 +107,7 @@ def run(goal: str) -> str:
       title: 'Tools: design, execution and errors',
       module: 'ai-agents',
       level: 'advanced',
-      minutes: 9,
+      minutes: 11,
       summary: 'What makes a tool usable by a model, and how to handle failures inside a loop.',
       why: 'Tools are the agent’s only way to affect anything. Their design determines whether the agent succeeds, and their implementation determines whether a mistake is recoverable.',
       prerequisites: ['what-is-an-agent'],
@@ -118,6 +118,38 @@ def run(goal: str) -> str:
       ],
       tags: ['tools', 'function calling', 'errors'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'A language model cannot look anything up, do arithmetic reliably, or change the world. Tool calling is the interface that fixes this: you describe the functions available, and instead of answering in prose the model may answer with a structured request to run one.',
+        },
+        {
+          kind: 'text',
+          body: 'The important thing to understand is that **the model never executes anything**. It emits a name and a JSON argument object. Your code decides whether to run it, runs it, and feeds the result back. Every security property of the system lives on your side of that line — the model is proposing, not acting.',
+        },
+        {
+          kind: 'steps',
+          items: [
+            { title: 'Describe the tools', body: 'Each gets a name, a description and a JSON schema for its arguments. The description is a prompt, not documentation: it is how the model decides when the tool applies.' },
+            { title: 'The model proposes a call', body: 'It returns a tool-use request rather than text, with arguments it believes match the schema.' },
+            { title: 'You validate and execute', body: 'Check the arguments, apply permissions, run the function. Never pass the arguments straight into a shell, a query or a filesystem path.' },
+            { title: 'Return the result', body: 'Append the output to the conversation and call again. The model now writes an answer, or requests another tool.' },
+          ],
+        },
+        {
+          kind: 'heading',
+          text: 'What makes tools work or fail',
+        },
+        {
+          kind: 'text',
+          body: 'Failures are almost always description problems, not model problems. Two tools whose descriptions overlap will be confused with each other. A tool with vague parameters will be called with invented values. A tool with fifteen optional parameters will be called wrongly more often than one with three required ones. Write the description for a competent stranger who can see nothing else about your system.',
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'Arguments are untrusted input',
+          body: 'The arguments are generated text, and the text that influenced them may have come from a web page or a document. Treat every field as hostile: validate against the schema, bound numeric ranges, allow-list identifiers, and never interpolate directly into SQL, shell or file paths. A tool that deletes or sends should require confirmation no matter how confident the call looks.',
+        },
         {
           kind: 'list',
           items: [

@@ -409,7 +409,7 @@ for k in range(2, 7):
       title: 'Overfitting, bias, variance and cross-validation',
       module: 'machine-learning',
       level: 'intermediate',
-      minutes: 9,
+      minutes: 11,
       summary: 'The central tension of the field, and the tools that manage it.',
       why: 'Every modelling decision — capacity, regularisation strength, how much data, when to stop training — is a position on the bias/variance trade-off. This is the topic that transfers unchanged to deep learning and LLM fine-tuning.',
       prerequisites: ['ml-fundamentals'],
@@ -420,6 +420,46 @@ for k in range(2, 7):
       ],
       tags: ['overfitting', 'bias-variance', 'cross-validation'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'Overfitting is the central failure of machine learning, and it is not a bug — it is what you get when a model does exactly what you asked. You asked it to minimise error on the training set, and a model with enough capacity can do that by memorising, which is perfect on the examples and worthless on anything new.',
+        },
+        {
+          kind: 'text',
+          body: 'The diagnosis is the gap between training and validation error. Both high: the model is too simple to capture the pattern — underfitting. Training low, validation high: it is memorising. Both low and close: you are done, assuming the split was honest.',
+        },
+        {
+          kind: 'heading',
+          text: 'Why a penalty helps',
+        },
+        {
+          kind: 'text',
+          body: 'Memorising usually requires large, finely balanced weights — extreme coefficients that cancel each other to reproduce individual points. Adding the size of the weights to the loss makes that expensive, so the model keeps a large weight only if it buys enough accuracy to pay for itself. That is all regularisation is: a price on complexity.',
+        },
+        {
+          kind: 'math',
+          expr: 'L_total = L_data + λ · penalty(w)',
+          note: 'λ sets the exchange rate between fitting the data and staying simple. Too low and nothing changes; too high and the model underfits. It is a hyperparameter, so it is chosen on validation data.',
+        },
+        {
+          kind: 'text',
+          body: '**L2** squares the weights, which punishes large ones hardest and shrinks everything smoothly towards zero without reaching it — the sensible default. **L1** uses absolute values, and its geometry drives some weights to exactly zero, so it performs feature selection as a side effect. **Elastic net** mixes both, which is the usual choice when features are correlated.',
+        },
+        {
+          kind: 'heading',
+          text: 'The other levers',
+        },
+        {
+          kind: 'text',
+          body: 'More training data is the most effective regulariser there is, and the one most often available. **Early stopping** halts training when validation error turns upward, which costs nothing. **Dropout** randomly disables units during training so the network cannot rely on any single path. **Simplifying the model** — fewer trees, shallower depth, fewer features — attacks the cause rather than the symptom.',
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'Overfitting the validation set',
+          body: 'Tune hyperparameters against a validation set for long enough and you overfit that too, by selection rather than by gradient. The validation score drifts upward while real performance does not move. This is why the test set is held back untouched, and why a result that only appears after fifty experiments deserves suspicion.',
+        },
         {
           kind: 'table',
           head: ['Training score', 'Validation score', 'Diagnosis', 'Fix'],

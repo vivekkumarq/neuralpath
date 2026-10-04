@@ -98,7 +98,7 @@ with mlflow.start_run(run_name="hgb-lr005"):
       title: 'Pipelines and CI/CD for ML',
       module: 'mlops',
       level: 'advanced',
-      minutes: 8,
+      minutes: 10,
       summary: 'Automating the path from data to deployed model, with gates that can refuse.',
       why: 'Manual training and deployment does not survive contact with a second model or a second person. Pipelines make the process repeatable and auditable.',
       prerequisites: ['experiment-tracking', 'git-and-collaboration'],
@@ -109,6 +109,37 @@ with mlflow.start_run(run_name="hgb-lr005"):
       ],
       tags: ['ci/cd', 'pipelines', 'airflow', 'deployment'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'Continuous integration for software asks one question: does the code still work? For machine learning there are three, because a model has three inputs that can each break independently — the code, the data and the trained artefact. A pipeline that only tests the first will ship a broken model with every test passing.',
+        },
+        {
+          kind: 'heading',
+          text: 'The gates worth having',
+        },
+        {
+          kind: 'text',
+          body: 'Test the **code** as normal: unit tests on transformations, a smoke test that trains on a tiny sample so the pipeline itself is exercised on every commit. Test the **data** with schema and distribution checks — column types, allowed ranges, null rates, category sets — because upstream changes are the most common cause of a model quietly degrading and they arrive without a pull request. Test the **model** by comparing it against the version currently in production on a fixed evaluation set, and refuse to promote it if it is worse.',
+        },
+        {
+          kind: 'text',
+          body: 'That last gate is the one teams skip and the one that matters most. Without it, "the tests passed" means the code ran, not that the model is any good.',
+        },
+        {
+          kind: 'heading',
+          text: 'Deployment is separate from release',
+        },
+        {
+          kind: 'text',
+          body: 'Getting a model onto a server and sending it live traffic are two different decisions, and separating them is what makes rollback possible. **Shadow mode** runs the new model alongside the old on real requests, logging its predictions without using them — the cheapest way to find out whether it behaves on production data. **Canary** releases send it a small share of traffic and watch the metrics before widening.',
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'Rollback means data too',
+          body: 'Reverting a model is not just redeploying the previous binary. The feature transformations have to match the model, so a version mismatch between the two produces predictions that are wrong rather than failures that are loud. Version the model and its preprocessing together, as one artefact.',
+        },
         {
           kind: 'steps',
           items: [
@@ -253,7 +284,7 @@ print(round(psi(train_scores, last_week_scores), 3))`,
       title: 'The roles: who does what',
       module: 'mlops',
       level: 'beginner',
-      minutes: 7,
+      minutes: 10,
       summary: 'Data scientist, ML engineer, AI engineer, LLM engineer, ML platform engineer — and what each interviews for.',
       why: 'These titles are used loosely and the day-to-day work differs substantially. Knowing which one you are aiming at tells you which parts of this curriculum to go deep on.',
       prerequisites: ['ml-fundamentals'],
@@ -264,6 +295,33 @@ print(round(psi(train_scores, last_week_scores), 3))`,
       ],
       tags: ['career', 'roles', 'interview'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'The job titles in this field are used inconsistently enough that two companies can mean almost opposite things by the same word. What is stable is the *work*, so it is worth reading roles by what they actually do rather than what they are called.',
+        },
+        {
+          kind: 'text',
+          body: 'Roughly, the field splits along two axes: how close you are to the data versus the production system, and whether you are creating models or applying existing ones. Almost every title sits somewhere on that grid.',
+        },
+        {
+          kind: 'heading',
+          text: 'What each one actually spends the day doing',
+        },
+        {
+          kind: 'text',
+          body: 'A **data analyst** answers questions with existing data — SQL, statistics, visualisation — and the output is a decision. A **data scientist** adds modelling and experiment design; much of the value is framing a vague business question into something measurable. A **machine learning engineer** builds and ships models, and is a software engineer first: the hard parts are pipelines, serving and reliability. A **data engineer** makes the data exist and keep existing, which is why they are usually the first hire that unblocks everyone else.',
+        },
+        {
+          kind: 'text',
+          body: 'An **AI engineer** is the newest and most ambiguous title. It usually means building applications on top of models you did not train — prompting, retrieval, agents, evaluation, cost and latency. The skill set overlaps far more with backend engineering than with research. A **research scientist** creates new methods and usually needs a doctorate; this is a small fraction of the jobs and the one most people overestimate.',
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'The most available route',
+          body: 'If you can already write software, AI engineering is the shortest path in, because it rewards engineering discipline over mathematics and the demand currently exceeds supply. If you come from analysis or statistics, data science is nearer. Either way the differentiator at interview is the same: something that runs, that you can explain the failure modes of.',
+        },
         {
           kind: 'table',
           head: ['Role', 'Output', 'Core skills', 'Interview weight'],

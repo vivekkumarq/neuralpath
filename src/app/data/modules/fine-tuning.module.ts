@@ -17,7 +17,7 @@ export const fineTuningModule: Module = {
       title: 'Prompting vs RAG vs fine-tuning',
       module: 'fine-tuning',
       level: 'advanced',
-      minutes: 9,
+      minutes: 10,
       summary: 'The decision framework, and why the order of attempts matters.',
       why: 'Choosing wrongly here costs weeks. Most problems presented as "we need to fine-tune" are retrieval or prompt problems, and the two cheaper options can be tested in an afternoon.',
       prerequisites: ['prompt-engineering', 'rag-pipeline'],
@@ -28,6 +28,44 @@ export const fineTuningModule: Module = {
       ],
       tags: ['fine-tuning', 'rag', 'decision'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'Fine-tuning is the most over-reached-for technique in applied AI. It is expensive, it dates immediately, and it is usually attempted to fix problems it cannot fix. Knowing when *not* to do it is worth more than knowing how.',
+        },
+        {
+          kind: 'text',
+          body: 'The single most useful rule: **fine-tuning teaches behaviour, not facts.** If the model does not know something, fine-tuning is the wrong tool — you want retrieval, which puts the fact in the context where the model can read it. If the model knows plenty but does not respond in the shape you need, that is behaviour, and that is what fine-tuning is for.',
+        },
+        {
+          kind: 'heading',
+          text: 'Try these first, in order',
+        },
+        {
+          kind: 'list',
+          ordered: true,
+          items: [
+            '**A better prompt.** A clear instruction with an explicit output format solves more cases than most people expect.',
+            '**Few-shot examples.** Five examples in the context often match what a fine-tune on a few hundred would achieve, and you can change them in seconds.',
+            '**Retrieval.** If the gap is knowledge, this is the answer, and it updates the moment the source does.',
+            '**A larger model.** Frequently cheaper in total than fine-tuning a small one, once your engineering time is counted.',
+            '**Then fine-tune** — when the above are exhausted and you have the data.',
+          ],
+        },
+        {
+          kind: 'heading',
+          text: 'What it is genuinely good at',
+        },
+        {
+          kind: 'text',
+          body: 'A consistent format or style that is tedious to describe but easy to demonstrate. A specialised vocabulary the base model handles awkwardly. Latency and cost, by moving a task onto a small model that only has to do one thing. And removing a long system prompt you would otherwise pay for on every request.',
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'The cost nobody budgets for',
+          body: 'A fine-tuned model is frozen against a base that keeps improving. In six months the general model may beat your specialised one outright, and you now maintain a dataset, a training pipeline and an evaluation suite to keep that from being true. Budget for the maintenance, not just the training run.',
+        },
         { kind: 'visual', id: 'adaptation-compare', caption: 'Compare the three approaches across cost, latency, freshness and effort.' },
         {
           kind: 'table',
@@ -85,7 +123,7 @@ export const fineTuningModule: Module = {
       title: 'Supervised fine-tuning and instruction tuning',
       module: 'fine-tuning',
       level: 'advanced',
-      minutes: 9,
+      minutes: 11,
       summary: 'Dataset format, quality over quantity, and the hyperparameters that matter.',
       why: 'SFT is the workhorse of adaptation. Its outcome is determined almost entirely by dataset quality, which is where the work actually is.',
       prerequisites: ['when-to-fine-tune', 'optimisers-and-schedules'],
@@ -96,6 +134,42 @@ export const fineTuningModule: Module = {
       ],
       tags: ['sft', 'instruction tuning', 'datasets'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'Supervised fine-tuning continues training a pretrained model on your own examples of input and desired output. Mechanically it is ordinary training — the same loss, the same gradients — but at a far smaller learning rate, because the aim is to adjust behaviour rather than rebuild knowledge.',
+        },
+        {
+          kind: 'text',
+          body: 'The work is almost entirely the dataset. A few hundred genuinely good examples beat tens of thousands of mediocre ones, and the reason is that the model copies what it is shown with no ability to tell intent from accident. If a tenth of your examples hedge, the tuned model hedges. If they are inconsistently formatted, it formats inconsistently. The dataset is the specification.',
+        },
+        {
+          kind: 'heading',
+          text: 'What the data has to look like',
+        },
+        {
+          kind: 'list',
+          items: [
+            '**Consistent.** One format, one voice, one way of refusing. Inconsistency is learned as randomness.',
+            '**Representative.** Including the awkward inputs, not only the clean ones you would like users to send.',
+            '**Correct.** Every example is an instruction. A wrong answer in the training set is a wrong answer taught deliberately.',
+            '**Held out.** Keep an evaluation split from the same distribution before you start, or you cannot tell whether tuning helped.',
+          ],
+        },
+        {
+          kind: 'heading',
+          text: 'Reading the run',
+        },
+        {
+          kind: 'text',
+          body: 'Training loss falling while validation loss rises is overfitting, and with small datasets it arrives within one or two epochs — far sooner than people expect. One to three epochs is typical; more usually memorises. The subtler risk is **catastrophic forgetting**: tune hard on a narrow task and general ability degrades, so the model gets better at your format and worse at everything around it. Evaluating only on your task hides this completely, which is why a general benchmark belongs in the loop too.',
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'Tune a small model, not a large one',
+          body: 'The usual winning configuration is a small model fine-tuned for one job, not a large one tuned to be slightly better at everything. It is cheaper to train, cheaper to serve, faster, and the narrower the task the smaller the model can be.',
+        },
         {
           kind: 'code',
           lang: 'json',

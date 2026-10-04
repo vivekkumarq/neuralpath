@@ -357,7 +357,7 @@ print(rrf([dense, lexical])[:3])
       title: 'Evaluating a RAG system',
       module: 'rag',
       level: 'advanced',
-      minutes: 9,
+      minutes: 11,
       summary: 'Measuring retrieval and generation separately, so you know which half to fix.',
       why: 'A single end-to-end score tells you something is wrong but not what. Splitting the measurement is what makes RAG debuggable.',
       prerequisites: ['rag-pipeline', 'genai-evaluation'],
@@ -368,6 +368,43 @@ print(rrf([dense, lexical])[:3])
       ],
       tags: ['evaluation', 'rag', 'metrics'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'A RAG system has two failure points, and a single end-to-end score cannot tell them apart. If the answer is wrong, either retrieval did not find the right passage, or it did and generation ignored or misread it. Those need completely different fixes, so they need separate measurements.',
+        },
+        {
+          kind: 'heading',
+          text: 'Measure retrieval on its own first',
+        },
+        {
+          kind: 'text',
+          body: 'Build a small set of questions with the passages that should be retrieved for each, and measure **recall at k** — how often the right passage appears in the top k. This is the ceiling on the whole system: if the passage is not retrieved, no amount of prompt work will recover the answer. Recall at k is the first number to fix, and chunking, embedding choice and hybrid search are the levers that move it.',
+        },
+        {
+          kind: 'text',
+          body: 'Then measure **precision** and ordering, because a correct passage buried at rank 20 competes with nineteen distractors for the model attention. This is what reranking addresses.',
+        },
+        {
+          kind: 'heading',
+          text: 'Then measure generation against what was retrieved',
+        },
+        {
+          kind: 'text',
+          body: 'Two properties matter and they are distinct. **Faithfulness** asks whether every claim in the answer is supported by the retrieved context — an unfaithful answer is a hallucination even when it happens to be true. **Relevance** asks whether the answer addresses the question. A faithful answer that answers a different question is still a failure.',
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'Build the evaluation set from real questions',
+          body: 'Questions you invent are cleaner, better spelled and more answerable than questions users ask. Take them from logs, support tickets and search queries, including the ambiguous and badly worded ones, because those are what the system will actually face.',
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'On LLM-as-judge',
+          body: 'Using a model to grade faithfulness scales, and it is the standard approach. It is also biased towards long, confident, familiar-sounding answers. Calibrate it against a few dozen human judgements before trusting it, and re-calibrate whenever you change the judge model.',
+        },
         {
           kind: 'table',
           head: ['Layer', 'Metric', 'Question'],
