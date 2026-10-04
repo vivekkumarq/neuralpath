@@ -3,7 +3,7 @@ import { Meta, Title } from '@angular/platform-browser';
 
 export const SITE_NAME = 'NeuralPath';
 export const SITE_TAGLINE = 'AI/ML Engineering by Vivek Kumar';
-export const SITE_URL = 'https://vivekkumarq.github.io/neuralpath';
+export const SITE_URL = 'https://neuralpath.duckdns.org';
 export const GITHUB_URL = 'https://github.com/vivekkumarq/neuralpath';
 export const LINKEDIN_URL = 'https://www.linkedin.com/in/vivekkumarq';
 

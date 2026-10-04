@@ -37,7 +37,7 @@ jobs:
       # The site is served from a project subpath, so assets and routes need
       # the base href to match.
       - name: Build for GitHub Pages
-        run: npm run build -- --base-href /neuralpath/
+        run: npm run build -- --base-href /
 
       - name: Prepare static output
         run: |

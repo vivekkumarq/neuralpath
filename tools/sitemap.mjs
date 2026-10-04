@@ -11,7 +11,7 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-const SITE = 'https://vivekkumarq.github.io/neuralpath';
+const SITE = 'https://neuralpath.duckdns.org';
 const DATA = 'src/app/data';
 
 const STATIC_ROUTES = [
