@@ -17,7 +17,7 @@ export const mlopsModule: Module = {
       title: 'Experiment tracking and model versioning',
       module: 'mlops',
       level: 'intermediate',
-      minutes: 7,
+      minutes: 10,
       summary: 'Recording what you ran so a result can be explained, compared and reproduced.',
       why: 'A project is dozens of runs. Without tracking, "which configuration produced the model in production?" becomes unanswerable within about two weeks.',
       prerequisites: ['environments-and-packaging', 'ml-fundamentals'],
@@ -28,6 +28,44 @@ export const mlopsModule: Module = {
       ],
       tags: ['mlflow', 'tracking', 'versioning'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'A model run has far more inputs than code: the data snapshot, the preprocessing, the hyperparameters, the random seed, the library versions and the hardware. Change any one and the result changes. Tracking exists so that a number you reported three weeks ago can still be explained, and ideally reproduced.',
+        },
+        {
+          kind: 'text',
+          body: 'The failure this prevents is specific and extremely common. A model is in production. Someone asks why it behaves oddly on a segment. Nobody can say which data it was trained on, which parameters won, or what else was tried and rejected. The only remaining option is to retrain from scratch and hope — which is expensive and may not reproduce.',
+        },
+        {
+          kind: 'heading',
+          text: 'What a run has to record',
+        },
+        {
+          kind: 'list',
+          items: [
+            '**The git commit** of the training code, and whether the tree was dirty.',
+            '**The data version** — a snapshot id, a hash, or a query with a timestamp. "The customers table" is not a version.',
+            '**Every hyperparameter**, including the ones left at their defaults, because defaults change between library versions.',
+            '**Metrics over time**, not only the final number, so you can see whether it converged or was stopped early.',
+            '**The artefact** — the weights plus the fitted preprocessing, versioned together, since a mismatch between them produces silently wrong predictions.',
+            '**The environment**, as a lockfile or an image digest.',
+          ],
+        },
+        {
+          kind: 'heading',
+          text: 'Seeds buy repeatability, not reproducibility',
+        },
+        {
+          kind: 'text',
+          body: 'Setting a seed makes a run repeatable on the same machine with the same versions. It does not survive a different GPU, a different cuDNN version, or non-deterministic kernels. Treat an exact-match reproduction as a bonus and aim instead for *statistical* reproducibility: the result should hold across several seeds. If it does not, the finding was noise, and that is worth discovering before it ships.',
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'Log the failures too',
+          body: 'The runs that did not work are the record of what you already ruled out. Without them, the team repeats the same dead ends every few months, usually with a new hire doing the repeating.',
+        },
         {
           kind: 'list',
           items: [
@@ -109,6 +147,11 @@ with mlflow.start_run(run_name="hgb-lr005"):
       ],
       tags: ['ci/cd', 'pipelines', 'airflow', 'deployment'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'One more reason the model gate matters: machine learning has no compiler. A pipeline can run end to end, produce an artefact, pass every unit test and deploy a model that predicts a single constant. Nothing in the toolchain objects, because nothing in the toolchain knows what the output is supposed to mean. An evaluation gate is the only thing standing between that and production.',
+        },
 
         {
           kind: 'text',

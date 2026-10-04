@@ -413,7 +413,7 @@ set_seed(42)`,
       title: 'Git, GitHub and working in the open',
       module: 'foundations',
       level: 'beginner',
-      minutes: 6,
+      minutes: 10,
       summary: 'Version control as an experiment log, not just a backup.',
       why: 'An ML project is a sequence of experiments. Git is what lets you answer "what exactly produced this number?" three weeks later, and it is how every team you will join moves code.',
       prerequisites: ['python-for-ml'],
@@ -424,6 +424,41 @@ set_seed(42)`,
       ],
       tags: ['git', 'tooling', 'collaboration'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'Git is the thing that lets you change code without fear. Every version is kept, so any mistake is reversible, and that single property is what makes experimentation safe — which matters more in machine learning than almost anywhere, because most of what you try will not work.',
+        },
+        {
+          kind: 'text',
+          body: 'The mental model worth having: git stores **snapshots**, not differences. A commit is a complete picture of the project at a moment, plus a pointer to its parent. A branch is just a movable label pointing at one commit, which is why creating one is instant and why branching freely costs nothing.',
+        },
+        {
+          kind: 'heading',
+          text: 'The three places a change lives',
+        },
+        {
+          kind: 'text',
+          body: 'Nearly all early confusion comes from not seeing these as separate. The **working directory** is your files as they are now. The **staging area** is what you have chosen to include in the next commit. The **repository** is the committed history. `git add` moves work from the first to the second; `git commit` moves it from the second to the third. Staging exists so you can commit part of your changes — it is what makes a clean, reviewable history possible when you have been working on two things at once.',
+        },
+        {
+          kind: 'heading',
+          text: 'Commits are a message to the future',
+        },
+        {
+          kind: 'text',
+          body: 'A commit should be one coherent change with a message saying *why*. The diff already shows what changed; what it cannot show is the reason, and the reason is what you will need in six months. "Fix bug" tells you nothing. "Use a trailing rather than a centred rolling mean, because the centred one leaked future values into the features" tells you everything, including why not to undo it.',
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'What not to commit',
+          body: 'Never commit credentials, API keys or `.env` files — git history is permanent, and removing a secret afterwards means rewriting history and rotating the key anyway. Large data files and model weights also do not belong in git; it stores them badly and the repository becomes unusable. A `.gitignore` written on day one costs nothing and prevents both.',
+        },
+        {
+          kind: 'text',
+          body: 'For notebooks specifically: the JSON format diffs terribly and stores output, so two people editing the same notebook produce conflicts no human can resolve. Clear outputs before committing, or move the real logic into `.py` files and keep the notebook as a thin layer over it.',
+        },
         {
           kind: 'text',
           body: 'The commands you need daily fit on one card. Everything else can be looked up when you hit it.',
@@ -484,7 +519,7 @@ git restore --source=HEAD~1 src/train.py   # undo one file`,
       title: 'Shell, Linux and remote machines',
       module: 'foundations',
       level: 'beginner',
-      minutes: 6,
+      minutes: 10,
       summary: 'Enough command line to drive a GPU box you do not own and keep a long job alive.',
       why: 'Training runs and inference servers live on Linux machines you reach over SSH. The terminal is the only interface you are guaranteed to have.',
       prerequisites: ['python-for-ml'],
@@ -495,6 +530,47 @@ git restore --source=HEAD~1 src/train.py   # undo one file`,
       ],
       tags: ['linux', 'tooling', 'infrastructure'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'Training happens on machines you cannot see. There is no desktop, no file manager and no way to click anything — the shell is the entire interface, which makes a small amount of fluency the difference between using a GPU server and being blocked by it.',
+        },
+        {
+          kind: 'text',
+          body: 'The idea that makes the shell powerful is composition. Each command does one thing and reads text; the pipe sends one command output into the next input. So you do not need a dedicated tool for "find the ten largest log files" — you compose it from tools that list, sort and truncate. Most of what looks like arcane knowledge is this one principle applied repeatedly.',
+        },
+        {
+          kind: 'heading',
+          text: 'Working on a machine you will disconnect from',
+        },
+        {
+          kind: 'text',
+          body: 'This is the problem that catches everyone once. You connect over SSH, start a twelve-hour training run, close your laptop, and the run dies — because your shell was the process parent and the connection going away killed it. **tmux** fixes it: start a session on the server, run the job inside it, detach, and the session keeps running without you. Reconnect tomorrow from anywhere and attach to the same session with the output still there.',
+        },
+        {
+          kind: 'list',
+          items: [
+            '`tmux new -s train` — start a named session.',
+            '`Ctrl-b d` — detach, leaving everything running.',
+            '`tmux attach -t train` — come back to it later.',
+            '`nvidia-smi` — what is on the GPU and how much memory is left.',
+            '`df -h` — why the disk is full, which eventually it will be.',
+          ],
+        },
+        {
+          kind: 'heading',
+          text: 'Moving data and keys',
+        },
+        {
+          kind: 'text',
+          body: 'Use key-based SSH rather than passwords: generate a keypair, put the public half on the server, keep the private half private. For files, `rsync` beats `scp` because it transfers only what changed and resumes after an interruption — which matters when the connection drops forty minutes into a dataset copy.',
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'There is no undo',
+          body: 'Deletion on a server is permanent — no recycle bin, no confirmation, and a recursive delete aimed at the wrong path is unrecoverable. Before any destructive command, run the listing version of it first and read what comes back. On a shared machine, assume someone else depends on anything you did not create yourself.',
+        },
         {
           kind: 'code',
           lang: 'bash',

@@ -126,7 +126,7 @@ print(classification_report(y_test, probs >= chosen, digits=3))`,
       title: 'Regression metrics',
       module: 'evaluation',
       level: 'beginner',
-      minutes: 6,
+      minutes: 10,
       summary: 'MAE, MSE, RMSE and R² — what each penalises and which to report.',
       why: 'Regression errors have units and a distribution. Picking a metric decides whether one catastrophic miss matters more than twenty small ones.',
       prerequisites: ['ml-fundamentals'],
@@ -137,6 +137,42 @@ print(classification_report(y_test, probs >= chosen, digits=3))`,
       ],
       tags: ['metrics', 'regression', 'rmse'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'Classification asks whether you were right. Regression asks how far off you were — and the metric you choose decides which kind of wrongness you are willing to tolerate, so it is a statement about the problem rather than a neutral measurement.',
+        },
+        {
+          kind: 'text',
+          body: 'The difference between the two common choices comes down to squaring. **MAE** averages the absolute errors, so being off by 10 is exactly twice as bad as being off by 5. **RMSE** squares them first, so being off by 10 is four times as bad. If one large miss is far worse than several small ones — a delivery estimate that is two hours out, a dosage, a structural load — RMSE matches that. If all errors cost proportionally, MAE does.',
+        },
+        {
+          kind: 'math',
+          expr: 'MAE = mean(|y − ŷ|)      RMSE = sqrt(mean((y − ŷ)²))',
+          note: 'Both are in the units of the target, which is why either can be reported to a non-technical stakeholder directly: "on average we are 4.2 minutes out".',
+        },
+        {
+          kind: 'heading',
+          text: 'Why R² is not an accuracy score',
+        },
+        {
+          kind: 'text',
+          body: 'R² compares your model against the simplest possible baseline: always predicting the mean. An R² of 0.8 means you removed 80% of the variance that baseline left. It is unitless, so it travels between problems, but it also rises whenever you add a feature — even a random one — which is why **adjusted R²** exists. A negative R² is not a bug: it means you are doing worse than predicting the average, which is worth knowing.',
+        },
+        {
+          kind: 'heading',
+          text: 'When percentages mislead',
+        },
+        {
+          kind: 'text',
+          body: '**MAPE** expresses error as a percentage of the true value, which is intuitive until the true value is near zero — then a tiny absolute error becomes an enormous percentage and the metric is dominated by the smallest cases. It is also asymmetric: over-forecasting is capped at 100% while under-forecasting is unbounded, so it quietly rewards models that predict low.',
+        },
+        {
+          kind: 'note',
+          tone: 'tip',
+          title: 'Always report against a baseline',
+          body: 'An RMSE of 12 is meaningless alone. Report it next to the naive baseline — the mean, or last week value for a time series. "RMSE 12 against a baseline of 31" is a result; "RMSE 12" is a number. Plotting residuals against the prediction is the other habit worth keeping: a pattern there means there is structure the model has not captured.',
+        },
         {
           kind: 'table',
           head: ['Metric', 'Units', 'Outliers', 'Reads as'],

@@ -191,7 +191,7 @@ for i, row in enumerate(X.toarray()):
       title: 'Word embeddings',
       module: 'nlp',
       level: 'intermediate',
-      minutes: 8,
+      minutes: 10,
       summary: 'Word2Vec, GloVe and the idea that meaning is a direction in space.',
       why: 'Embeddings replaced sparse counts with dense vectors where distance means similarity. Everything in the modern stack — semantic search, RAG retrieval, recommendation — rests on this idea.',
       prerequisites: ['bag-of-words-and-tfidf', 'vectors-and-matrices'],
@@ -202,6 +202,37 @@ for i, row in enumerate(X.toarray()):
       ],
       tags: ['word2vec', 'glove', 'embeddings'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'Bag of words gives every term its own column, so "excellent" and "superb" are as unrelated as "excellent" and "tractor". The vocabulary is also enormous and almost entirely zeros. Embeddings fix both: every word becomes a few hundred dense numbers, and words used in similar contexts end up near each other.',
+        },
+        {
+          kind: 'text',
+          body: 'The insight they are built on is old and simple — a word is characterised by the company it keeps. If two words appear in the same contexts, they are probably similar, and you can learn that from raw text with no labels at all. **Word2Vec** turns it into a prediction task: given a word, predict its neighbours (skip-gram), or given the neighbours, predict the word (CBOW). The model is thrown away afterwards; the weights it learned *are* the embeddings.',
+        },
+        {
+          kind: 'heading',
+          text: 'Why the arithmetic works',
+        },
+        {
+          kind: 'text',
+          body: 'The famous result is that `king − man + woman` lands near `queen`. It works because the training objective pushes words that share contexts together, and relationships that are consistent across many word pairs — gender, tense, plurality, capital-of — end up encoded as roughly consistent directions in the space. The analogies are a visible consequence of that, not a feature anyone designed, and they are less reliable than the famous examples suggest.',
+        },
+        {
+          kind: 'heading',
+          text: 'The limitation that ended them',
+        },
+        {
+          kind: 'text',
+          body: 'A Word2Vec vector is **static**: "bank" has one vector that averages the river and the financial sense, and no context can change it. That single limitation is what motivated contextual embeddings and, eventually, transformers — where a token representation is computed from the sentence it appears in, so the two banks get different vectors. Everything in the transformer and LLM stages follows from this problem.',
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'They learn the bias in the corpus',
+          body: 'Embeddings trained on human text reproduce human associations, including the ones you do not want — occupation vectors align with gender, name vectors with ethnicity. These are not incidental; they are the same statistical regularity that makes the model useful. If embeddings feed a decision about people, this needs measuring rather than assuming.',
+        },
         {
           kind: 'text',
           body: 'The distributional hypothesis: words that appear in similar contexts have similar meanings. Word2Vec operationalises it by training a small network to predict a word’s neighbours (skip-gram) or a word from its neighbours (CBOW). The prediction task is thrown away; the hidden weights are the embeddings.',

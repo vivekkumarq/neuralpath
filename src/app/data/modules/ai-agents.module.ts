@@ -300,7 +300,7 @@ def get_order_status(order_id: str, user_id: str) -> dict:
       title: 'Reliability, guardrails and evaluation',
       module: 'ai-agents',
       level: 'expert',
-      minutes: 10,
+      minutes: 11,
       summary: 'Making a non-deterministic loop safe to run in front of real users.',
       why: 'The gap between an agent demo and an agent product is entirely reliability engineering. A 90% success rate per step is a 35% success rate over ten steps.',
       prerequisites: ['agent-memory-and-state', 'tool-calling'],
@@ -311,6 +311,44 @@ def get_order_status(order_id: str, user_id: str) -> dict:
       ],
       tags: ['reliability', 'guardrails', 'evaluation', 'agents'],
       blocks: [
+
+        {
+          kind: 'text',
+          body: 'An agent multiplies the failure rate of its own steps. A single call that is right 95% of the time is usually fine; ten chained calls at 95% succeed end to end about 60% of the time. Reliability work on agents is mostly about refusing to let that compounding happen unchecked.',
+        },
+        {
+          kind: 'math',
+          expr: '0.95¹⁰ ≈ 0.60',
+          note: 'The arithmetic that makes long autonomous chains impractical. Either raise per-step reliability, or shorten the chain, or add checks that catch a bad step before it propagates.',
+        },
+        {
+          kind: 'heading',
+          text: 'The failure modes worth designing against',
+        },
+        {
+          kind: 'text',
+          body: 'Agents fail in recognisable ways. They **loop**, calling the same tool with the same arguments forever. They **drift**, gradually losing the original objective across a long context. They **hallucinate tool results** when a call fails and the error is not surfaced clearly. They **over-plan**, producing elaborate sequences for something that needed one step. And they **give up silently**, returning a plausible summary of work they did not do.',
+        },
+        {
+          kind: 'list',
+          items: [
+            '**Cap everything.** A maximum number of steps, a wall-clock budget and a token budget, enforced in your loop rather than requested in the prompt.',
+            '**Detect repetition.** Hash the tool name and arguments; if the same call recurs, break out rather than letting it spin.',
+            '**Make errors legible.** Return a short, specific error the model can act on. A stack trace invites invention; "file not found: report.csv" invites a correction.',
+            '**Re-state the goal.** Keep the original objective pinned in context so a long run cannot drift away from it.',
+            '**Checkpoint.** Record what succeeded so a failure resumes rather than restarting, which matters once steps have side effects.',
+          ],
+        },
+        {
+          kind: 'note',
+          tone: 'warn',
+          title: 'A human gate beats a clever prompt',
+          body: 'For anything irreversible — sending, paying, deleting, publishing — no amount of prompting makes autonomous execution safe, because the failure is unbounded while the saving is a click. Put a confirmation in the path and state plainly what is about to happen.',
+        },
+        {
+          kind: 'text',
+          body: 'The most effective reliability measure is usually structural rather than clever: constrain the agent to the shortest chain that solves the problem. A workflow with three fixed steps and one model call in the middle beats a free-running agent on almost every production task, and it can be tested.',
+        },
         {
           kind: 'math',
           expr: '0.95¹⁰ ≈ 0.60',
