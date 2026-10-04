@@ -44,6 +44,13 @@ const KNOWN_VISUALS = [
   'lora',
   'quantisation',
   'drift',
+  'mdp-loop',
+  'decomposition',
+  'walk-forward',
+  'autoencoder',
+  'matrix-factorisation',
+  'isolation',
+  'residual',
 ];
 
 describe('curriculum', () => {

@@ -37,7 +37,14 @@ export type VisualId =
   | 'chunking'
   | 'lora'
   | 'quantisation'
-  | 'drift';
+  | 'drift'
+  | 'mdp-loop'
+  | 'decomposition'
+  | 'walk-forward'
+  | 'autoencoder'
+  | 'matrix-factorisation'
+  | 'isolation'
+  | 'residual';
 
 export interface Quiz {
   /** Stable id so an answered quiz stays answered across visits. */

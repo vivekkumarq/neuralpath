@@ -247,6 +247,11 @@ print(f"R2   {r2_score(y_test, pred):.3f}")`,
           body: 'A test score is a prediction about data you have not seen. The split is what makes that prediction honest, and almost every inflated result in machine learning comes from a split that quietly let the model see something it should not have.',
         },
         {
+          kind: 'visual',
+          id: 'walk-forward',
+          caption: 'Why random folds leak on ordered data, and what walk-forward does instead.',
+        },
+        {
           kind: 'text',
           body: 'The baseline arrangement is three sets. **Train** fits the parameters. **Validation** chooses between models and hyperparameters. **Test** is touched once, at the end, to report a number. The reason validation and test are separate is subtle but important: if you pick the model that scores best on a set, that score is no longer an unbiased estimate of anything — you optimised against it. Run forty experiments against your test set and you have fitted to it by hand.',
         },

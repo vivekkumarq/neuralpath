@@ -36,6 +36,11 @@ export const reinforcementLearningModule: Module = {
           body: 'An **agent** observes a **state**, takes an **action**, and the environment returns a **reward** and a new state. That loop is the whole setting. What makes it hard is that the reward is usually late: the move that lost you the game happened twenty moves before the loss.',
         },
         {
+          kind: 'visual',
+          id: 'mdp-loop',
+          caption: 'Step through the loop. The reward arrives after the action, and the large one only at the end.',
+        },
+        {
           kind: 'table',
           head: ['Paradigm', 'What it is given', 'What it optimises'],
           rows: [

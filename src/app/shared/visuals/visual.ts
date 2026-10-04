@@ -29,6 +29,13 @@ import {
   RagPipelineVisual,
   VectorSearchVisual,
 } from './system.visuals';
+import { DecompositionVisual, MdpLoopVisual, WalkForwardVisual } from './applied.visuals';
+import {
+  AutoencoderVisual,
+  IsolationVisual,
+  MatrixFactorisationVisual,
+  ResidualVisual,
+} from './repr.visuals';
 
 /**
  * The figure registry.
@@ -67,6 +74,13 @@ import {
     LoraVisual,
     QuantisationVisual,
     DriftVisual,
+    MdpLoopVisual,
+    DecompositionVisual,
+    WalkForwardVisual,
+    AutoencoderVisual,
+    MatrixFactorisationVisual,
+    IsolationVisual,
+    ResidualVisual,
   ],
   template: `
     <figure>
@@ -149,6 +163,27 @@ import {
           }
           @case ('drift') {
             <app-viz-drift />
+          }
+          @case ('mdp-loop') {
+            <app-viz-mdp-loop />
+          }
+          @case ('decomposition') {
+            <app-viz-decomposition />
+          }
+          @case ('walk-forward') {
+            <app-viz-walk-forward />
+          }
+          @case ('autoencoder') {
+            <app-viz-autoencoder />
+          }
+          @case ('matrix-factorisation') {
+            <app-viz-matrix-factorisation />
+          }
+          @case ('isolation') {
+            <app-viz-isolation />
+          }
+          @case ('residual') {
+            <app-viz-residual />
           }
         }
       </div>

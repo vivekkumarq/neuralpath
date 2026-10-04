@@ -107,6 +107,11 @@ print(h.shape, sum(p.numel() for p in conv1.parameters()), "params in conv1")
           body: 'A convolution layer finds local patterns. Stack enough of them and the patterns compose: the first layer responds to edges, the next to corners and textures made of those edges, the next to object parts, and the last to whole objects. Nobody designs that hierarchy — it falls out of training, and it is the reason convolutional networks displaced hand-engineered vision features almost overnight.',
         },
         {
+          kind: 'visual',
+          id: 'residual',
+          caption: 'The shortcut gives the gradient a path with no weights on it.',
+        },
+        {
           kind: 'text',
           body: 'The architectures below are the landmarks in that story. Each one exists because the previous one hit a specific wall, so the sequence is worth reading as an argument rather than a list of names.',
         },

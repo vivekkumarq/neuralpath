@@ -620,6 +620,11 @@ loader = DataLoader(TensorDataset(X, y), batch_size=64, shuffle=True)`,
           body: 'An **autoencoder** is a network trained to output its own input. An encoder compresses the input into a small code, a decoder expands it back, and the loss is reconstruction error. The output is worthless — the point is the code in the middle, which has to retain whatever matters and discard the rest.',
         },
         {
+          kind: 'visual',
+          id: 'autoencoder',
+          caption: 'Everything has to pass through the two-dimensional code, so copying is impossible.',
+        },
+        {
           kind: 'note',
           tone: 'info',
           title: 'It is PCA with the linearity removed',

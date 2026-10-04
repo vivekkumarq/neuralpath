@@ -554,6 +554,11 @@ print("held out:", round(search.score(X_test, y_test), 4))   # touched once`,
           body: 'Start by deciding what you actually have. If you have a reasonable number of labelled anomalies, this is an **imbalanced classification** problem and the tools from that stage apply. If you have only normal data, it is **novelty detection**. If you have unlabelled data that probably contains some anomalies already, it is **outlier detection**. The three need different algorithms.',
         },
         {
+          kind: 'visual',
+          id: 'isolation',
+          caption: 'Random cuts isolate the outlier in two splits; the dense point takes nine.',
+        },
+        {
           kind: 'table',
           head: ['Method', 'How it defines unusual', 'Where it fits'],
           rows: [
@@ -653,6 +658,11 @@ scores = -model.score_samples(X_test)`,
         {
           kind: 'text',
           body: 'A time series is an ordered sequence of observations, and the order carries information: today looks like yesterday, December looks like last December. Three components are usually worth separating — **trend** (long-run direction), **seasonality** (a repeating cycle of known period), and the **residual** left over.',
+        },
+        {
+          kind: 'visual',
+          id: 'decomposition',
+          caption: 'The same series separated into trend, seasonality and what is left over.',
         },
         { kind: 'heading', text: 'Stationarity' },
         {
@@ -781,6 +791,11 @@ for train_idx, test_idx in splitter.split(X):
         {
           kind: 'text',
           body: 'There are two ways to decide what someone will like. **Content-based** filtering describes the items and recommends things similar to what they already chose. **Collaborative** filtering ignores the items entirely and uses the crowd: people who behaved like you also liked this.',
+        },
+        {
+          kind: 'visual',
+          id: 'matrix-factorisation',
+          caption: 'A mostly empty ratings matrix rebuilt from two small factor matrices.',
         },
         {
           kind: 'table',
