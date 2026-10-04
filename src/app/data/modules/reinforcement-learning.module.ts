@@ -276,6 +276,11 @@ for episode in range(episodes):
           body: 'Preferences are easy to *compare* and hard to *write*. Nobody can author the single ideal reply to a question, but almost anyone can look at two replies and say which is better. RLHF is built entirely on that asymmetry.',
         },
         {
+          kind: 'visual',
+          id: 'rlhf-pipeline',
+          caption: 'The three stages, and the penalty that keeps the last one honest.',
+        },
+        {
           kind: 'steps',
           items: [
             {

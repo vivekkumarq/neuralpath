@@ -51,6 +51,9 @@ const KNOWN_VISUALS = [
   'matrix-factorisation',
   'isolation',
   'residual',
+  'rlhf-pipeline',
+  'sigmoid',
+  'metric-sensitivity',
 ];
 
 describe('curriculum', () => {

@@ -44,7 +44,10 @@ export type VisualId =
   | 'autoencoder'
   | 'matrix-factorisation'
   | 'isolation'
-  | 'residual';
+  | 'residual'
+  | 'rlhf-pipeline'
+  | 'sigmoid'
+  | 'metric-sensitivity';
 
 export interface Quiz {
   /** Stable id so an answered quiz stays answered across visits. */

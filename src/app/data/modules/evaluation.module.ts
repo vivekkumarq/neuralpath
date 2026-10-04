@@ -143,6 +143,11 @@ print(classification_report(y_test, probs >= chosen, digits=3))`,
           body: 'Classification asks whether you were right. Regression asks how far off you were — and the metric you choose decides which kind of wrongness you are willing to tolerate, so it is a statement about the problem rather than a neutral measurement.',
         },
         {
+          kind: 'visual',
+          id: 'metric-sensitivity',
+          caption: 'Watch RMSE pull away from MAE as a single prediction drifts.',
+        },
+        {
           kind: 'text',
           body: 'The difference between the two common choices comes down to squaring. **MAE** averages the absolute errors, so being off by 10 is exactly twice as bad as being off by 5. **RMSE** squares them first, so being off by 10 is four times as bad. If one large miss is far worse than several small ones — a delivery estimate that is two hours out, a dosage, a structural load — RMSE matches that. If all errors cost proportionally, MAE does.',
         },

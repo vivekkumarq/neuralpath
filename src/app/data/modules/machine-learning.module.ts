@@ -108,6 +108,11 @@ export const machineLearningModule: Module = {
           note: 'Linear regression: a weighted sum. Each weight is the predicted change in the output per unit change in that feature, holding the others fixed.',
         },
         {
+          kind: 'visual',
+          id: 'sigmoid',
+          caption: 'An unbounded score becomes a probability, and only a threshold turns it into a class.',
+        },
+        {
           kind: 'text',
           body: 'Logistic regression takes the same weighted sum and squashes it through a sigmoid into (0, 1), giving a **probability** rather than a class. The class comes afterwards, by comparing against a threshold you choose — and 0.5 is a default, not a law.',
         },

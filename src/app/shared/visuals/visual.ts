@@ -36,6 +36,11 @@ import {
   MatrixFactorisationVisual,
   ResidualVisual,
 } from './repr.visuals';
+import {
+  MetricSensitivityVisual,
+  RlhfPipelineVisual,
+  SigmoidVisual,
+} from './more.visuals';
 
 /**
  * The figure registry.
@@ -81,6 +86,9 @@ import {
     MatrixFactorisationVisual,
     IsolationVisual,
     ResidualVisual,
+    RlhfPipelineVisual,
+    SigmoidVisual,
+    MetricSensitivityVisual,
   ],
   template: `
     <figure>
@@ -184,6 +192,15 @@ import {
           }
           @case ('residual') {
             <app-viz-residual />
+          }
+          @case ('rlhf-pipeline') {
+            <app-viz-rlhf-pipeline />
+          }
+          @case ('sigmoid') {
+            <app-viz-sigmoid />
+          }
+          @case ('metric-sensitivity') {
+            <app-viz-metric-sensitivity />
           }
         }
       </div>
