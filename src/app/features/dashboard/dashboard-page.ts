@@ -191,8 +191,11 @@ import { Icon } from '../../shared/icon';
       margin-bottom: var(--sp-3);
     }
 
+    /* The label carries a full topic title, so it has to be allowed to wrap. */
     .headline .btn {
       margin-top: var(--sp-4);
+      white-space: normal;
+      text-align: left;
     }
 
     .stages {
