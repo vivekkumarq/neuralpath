@@ -34,8 +34,8 @@ jobs:
       - name: Refresh the sitemap
         run: npm run sitemap
 
-      # The site is served from a project subpath, so assets and routes need
-      # the base href to match.
+      # The site is served from the root of its custom domain (public/CNAME),
+      # so assets and routes resolve against "/".
       - name: Build for GitHub Pages
         run: npm run build -- --base-href /
 
