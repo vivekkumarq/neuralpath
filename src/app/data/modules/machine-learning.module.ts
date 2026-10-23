@@ -81,7 +81,7 @@ export const machineLearningModule: Module = {
         },
       ],
       resources: [
-        { label: 'scikit-learn: an introduction to machine learning', url: 'https://scikit-learn.org/stable/tutorial/basic/tutorial.html', kind: 'docs' },
+        { label: 'scikit-learn: getting started', url: 'https://scikit-learn.org/stable/getting_started.html', kind: 'docs' },
         { label: 'Google Machine Learning Crash Course', url: 'https://developers.google.com/machine-learning/crash-course', kind: 'course' },
       ],
       related: ['overfitting-and-regularisation', 'classification-metrics'],
