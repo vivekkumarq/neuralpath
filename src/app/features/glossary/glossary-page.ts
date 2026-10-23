@@ -57,7 +57,7 @@ import { Icon } from '../../shared/icon';
 
       <div class="letters">
         @for (letter of letters(); track letter) {
-          <a [href]="'#letter-' + letter">{{ letter }}</a>
+          <a [href]="letterLink(letter)" (click)="jump($event, 'letter-' + letter)">{{ letter }}</a>
         }
       </div>
 
@@ -265,5 +265,21 @@ export class GlossaryPage {
 
   protected label(slug: string): string | undefined {
     return termBySlug(slug)?.term;
+  }
+
+  /**
+   * A bare `#letter-x` resolves against `<base href>` and would navigate to the
+   * landing page, so the link carries the full path and the click scrolls.
+   */
+  protected letterLink(letter: string): string {
+    return `${location.pathname}${location.search}#letter-${letter}`;
+  }
+
+  protected jump(event: Event, id: string): void {
+    const target = document.getElementById(id);
+    if (!target) return;
+    event.preventDefault();
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    history.replaceState(null, '', `${location.pathname}${location.search}#${id}`);
   }
 }
