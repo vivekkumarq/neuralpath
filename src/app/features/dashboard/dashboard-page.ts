@@ -43,7 +43,7 @@ import { Icon } from '../../shared/icon';
           <p class="dim">
             {{ progress.completedCount() }} of {{ stats.topics }} topics ·
             {{ answered() }} of {{ stats.quizzes }} checks answered ·
-            {{ bookmarks.count() }} bookmarks
+            {{ bookmarks.count() }} {{ bookmarks.count() === 1 ? 'bookmark' : 'bookmarks' }}
           </p>
 
           @if (progress.nextTopic(); as next) {
