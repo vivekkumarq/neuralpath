@@ -269,7 +269,7 @@ export const orientationModule: Module = {
           kind: 'note',
           tone: 'tip',
           title: 'You do not have to choose now',
-          body: 'The first eight stages are shared ground for all of these roles. Read them in order, build a couple of the projects, and the choice will make itself once you find which part you enjoy. The [roles topic](https://vivekkumarq.github.io/neuralpath/learn/mlops/ai-roles) covers the differences in detail once you have the context to care.',
+          body: 'The first eight stages are shared ground for all of these roles. Read them in order, build a couple of the projects, and the choice will make itself once you find which part you enjoy. The [roles topic](https://neuralpath.duckdns.org/learn/mlops/ai-roles) covers the differences in detail once you have the context to care.',
         },
         {
           kind: 'quiz',
