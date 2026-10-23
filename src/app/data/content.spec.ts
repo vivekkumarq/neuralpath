@@ -126,6 +126,17 @@ describe('curriculum', () => {
     expect(new Set(ids).size, 'duplicate quiz ids').toBe(ids.length);
   });
 
+  it('gives every heading in a topic its own anchor', () => {
+    // Same slug rule as ContentBlocks.anchor(); a repeat would put two entries
+    // in the table of contents that both jump to the first section.
+    for (const topic of allTopics()) {
+      const anchors = topic.blocks
+        .flatMap((block) => (block.kind === 'heading' ? [block.text] : []))
+        .map((text) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
+      expect(new Set(anchors).size, topic.slug).toBe(anchors.length);
+    }
+  });
+
   it('keeps table rows the same width as their header', () => {
     for (const topic of allTopics()) {
       for (const block of topic.blocks) {
