@@ -96,6 +96,14 @@ export class UiService {
     this.lockScroll(false);
   }
 
+  /** Escape: every overlay, plus the sidebar where it is a drawer. */
+  closeAll(): void {
+    this.closePalette();
+    this.closeAppearance();
+    this.closeShortcuts();
+    this.closeSidebarOnMobile();
+  }
+
   private lockScroll(locked: boolean): void {
     if (typeof document === 'undefined') return;
     document.body.style.overflow = locked ? 'hidden' : '';
