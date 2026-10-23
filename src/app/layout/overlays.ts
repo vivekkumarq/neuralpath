@@ -207,9 +207,14 @@ export class Shortcuts {
     { keys: 'T', does: 'Switch light and dark' },
   ];
 
-  /** `?` anywhere opens the map; Escape closes it. */
+  /** `?` anywhere opens the map; Escape closes whatever is open, as the map promises. */
   @HostListener('document:keydown', ['$event'])
   protected onKey(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      this.ui.closeAll();
+      return;
+    }
+
     const typing =
       event.target instanceof HTMLElement &&
       ['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName);
@@ -218,8 +223,6 @@ export class Shortcuts {
     if (event.key === '?') {
       event.preventDefault();
       this.ui.toggleShortcuts();
-    } else if (event.key === 'Escape' && this.ui.shortcutsOpen()) {
-      this.ui.closeShortcuts();
     }
   }
 }
