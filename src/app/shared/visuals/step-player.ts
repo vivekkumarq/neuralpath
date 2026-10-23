@@ -7,6 +7,7 @@ import {
   input,
   output,
   signal,
+  untracked,
 } from '@angular/core';
 import { Icon } from '../icon';
 
@@ -128,10 +129,12 @@ export class StepPlayer implements OnDestroy {
 
   constructor() {
     effect(() => {
-      // Reading both inputs here re-arms the timer if either changes.
+      // Reading both inputs here re-arms the timer if either changes. `playing`
+      // is read untracked: tracking it would restart playback the moment the
+      // reader pauses or picks a step.
       const shouldPlay = this.autoplay() && !this.reduced;
       this.interval();
-      if (shouldPlay && !this.playing()) {
+      if (shouldPlay && !untracked(this.playing)) {
         this.playing.set(true);
         this.arm();
       }
