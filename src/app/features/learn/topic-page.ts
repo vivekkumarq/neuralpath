@@ -444,6 +444,13 @@ export class TopicPage {
     effect(() => {
       const data = this.topic();
       if (!data) return;
+      // Slugs are unique across the curriculum, so a topic reached under the
+      // wrong stage (a stale link, a moved topic) is sent to its real address
+      // rather than rendered with another stage's breadcrumb and progress.
+      if (data.module !== this.module()) {
+        void this.router.navigate(['/learn', data.module, data.slug], { replaceUrl: true });
+        return;
+      }
       this.seo.update(data.title, data.summary, `/learn/${data.module}/${data.slug}`);
       this.progress.markVisited(data.slug, data.title);
     });
