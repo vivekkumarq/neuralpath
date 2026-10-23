@@ -50,10 +50,14 @@ import { Icon } from '../../shared/icon';
 
         <label class="field profile-picker">
           <app-icon name="filter" [size]="15" />
-          <select [value]="progress.activeProfile()" (change)="setProfile($event)" aria-label="Learner profile">
-            <option value="">Curriculum order</option>
+          <!-- Selection is bound per option: a [value] on the select is applied
+               before the @for has created the options, so it never takes. -->
+          <select (change)="setProfile($event)" aria-label="Learner profile">
+            <option value="" [selected]="!activeProfile()">Curriculum order</option>
             @for (entry of profiles; track entry.id) {
-              <option [value]="entry.id">{{ entry.label }}</option>
+              <option [value]="entry.id" [selected]="activeProfile()?.id === entry.id">
+                {{ entry.label }}
+              </option>
             }
           </select>
         </label>
