@@ -201,8 +201,8 @@ export class Shortcuts {
     { keys: '/', does: 'Jump to the search box' },
     { keys: '?', does: 'Show this list' },
     { keys: 'Esc', does: 'Close whatever is open' },
-    { keys: 'J', does: 'Next topic in this stage' },
-    { keys: 'K', does: 'Previous topic in this stage' },
+    { keys: 'J', does: 'Next topic' },
+    { keys: 'K', does: 'Previous topic' },
     { keys: 'B', does: 'Toggle the sidebar' },
     { keys: 'T', does: 'Switch light and dark' },
   ];
