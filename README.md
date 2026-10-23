@@ -53,7 +53,7 @@ Every topic has to answer six questions before it is considered finished: what i
 - **SCSS** with CSS custom properties for theming — no UI framework
 - **Hand-written SVG and CSS** for every diagram, so they scale, theme correctly and cost almost nothing to download
 - **No backend, no database, no authentication, no analytics, no runtime dependencies** beyond Angular and RxJS
-- Route-level code splitting; the content data loads on demand rather than in the initial bundle
+- Route-level code splitting; the interview bank, glossary, projects and resources load on demand, while the curriculum itself ships in the initial bundle because the sidebar lists every topic
 
 ## Local development
 
