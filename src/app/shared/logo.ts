@@ -15,7 +15,6 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
     <span class="mark" aria-hidden="true">
       <svg viewBox="0 0 28 28" width="24" height="24" fill="none">
         <path
-          id="np-trace"
           d="M6.5 21 14 7.5 21.5 21"
           stroke="currentColor"
           stroke-width="1.6"
