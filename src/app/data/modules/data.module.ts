@@ -213,7 +213,7 @@ merged = df.merge(plans, on="plan", how="left", validate="many_to_one")`,
           title: 'Fit on train, apply to everything',
           body: 'Every statistic used to clean — a mean for imputation, a scaler range, a category list — must come from the training split alone. Computing it over the full dataset is the most common leak in applied machine learning, and it inflates every score you report afterwards. Put the steps in a pipeline so it cannot happen by accident.',
         },
-        { kind: 'heading', text: 'Missing values' },
+        { kind: 'heading', text: 'Choosing an imputation strategy' },
         {
           kind: 'table',
           head: ['Strategy', 'When it fits', 'Risk'],
