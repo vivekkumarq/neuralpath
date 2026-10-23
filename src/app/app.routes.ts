@@ -24,7 +24,7 @@ export const routes: Routes = [
     loadComponent: () => import('./features/roadmap/roadmap-page').then((m) => m.RoadmapPage),
     data: {
       description:
-        'The full AI/ML engineering roadmap: seventeen stages from what AI is to ' +
+        'The full AI/ML engineering roadmap: eighteen stages from what AI is to ' +
         'production AI, each with its topics, prerequisites and estimated reading time.',
     },
   },
