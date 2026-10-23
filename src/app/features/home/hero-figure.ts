@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { CURRICULUM_STATS } from '../../data/curriculum';
 
 interface Node {
   x: number;
@@ -41,7 +42,7 @@ const PATH = [NODES[2], NODES[7], NODES[14], NODES[19]];
       <div class="chrome">
         <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
         <span class="label">forward pass</span>
-        <span class="shape">67 topics · 16 stages</span>
+        <span class="shape">{{ stats.topics }} topics · {{ stats.modules }} stages</span>
       </div>
 
       <svg viewBox="0 0 320 214" role="img" aria-label="An abstract neural network with a signal passing through it">
@@ -199,6 +200,7 @@ const PATH = [NODES[2], NODES[7], NODES[14], NODES[19]];
   `,
 })
 export class HeroFigure {
+  protected readonly stats = CURRICULUM_STATS;
   protected readonly nodes = NODES;
   protected readonly edges = EDGES;
 
